@@ -2,6 +2,9 @@
 # System Files
 .DS_Store/
 
+# Build
+dist/
+
 # IDEs and editors
 .idea/
 
