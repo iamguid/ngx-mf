@@ -1,0 +1,10 @@
+{
+  "name": "ngx-mf",
+  "version": "1.0.0",
+  "description": "Bind your model types to angular FormGroup type",
+  "main": "index.ts",
+  "repository": "https://github.com/iamguid/ngx-mf",
+  "author": "Vladislav <iam.guid@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
