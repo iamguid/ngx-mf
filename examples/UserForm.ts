@@ -35,5 +35,3 @@ form.patchValue(patch);
 
 console.log('Form is valid', form.valid);
 console.log('My nickname', form.value.nick);
-
-form.controls
