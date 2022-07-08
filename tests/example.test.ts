@@ -1,10 +1,9 @@
 import "@angular/compiler";
 
 import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms"
-import { FormControlsOf } from ".."
+import { FormModel } from ".."
 
 describe('User form example', () => {
-
     it('should work', () => {
         enum ContactType {
             Email,
@@ -25,14 +24,14 @@ describe('User form example', () => {
             contacts: IContactModel[];
         }
 
-        type UserForm = FormGroup<FormControlsOf<Omit<IUserModel, 'id'>, { contacts: ['group'] }>>
+        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }>
 
         const form: UserForm = new FormGroup({
             firstName: new FormControl<string | null>(null),
             lastName: new FormControl<string | null>(null),
             nick: new FormControl<string | null>(null),
             birthday: new FormControl<Date | null>(null),
-            contacts: new FormArray<FormGroup<FormControlsOf<IContactModel>>>([]),
+            contacts: new FormArray<FormModel<IContactModel>>([]),
         });
 
         const value: Omit<IUserModel, 'id'> = {
