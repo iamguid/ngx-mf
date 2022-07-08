@@ -9,9 +9,9 @@ export type FormControlsOf<
 
 export type FormControlsOfNonNullable<
   TObj extends Record<string, any>,
-  TAnnotationsObj extends PrepareAnnotationsObj<TPreparedObj> | null = null,
+  TPreparedAnnotationsObj extends PrepareAnnotationsObj<TPreparedObj> | null = null,
   TPreparedObj = PrepareObj<TObj>
-> = FormControlsOfInner<TPreparedObj, false, true, TAnnotationsObj>;
+> = FormControlsOfInner<TPreparedObj, false, true, TPreparedAnnotationsObj>;
 
 type DEBUG = false;
 type DEBUG_1 = DEBUG extends true ? '1' : never;
@@ -24,16 +24,18 @@ type DEBUG_7 = DEBUG extends true ? '7' : never;
 type DEBUG_8 = DEBUG extends true ? '8' : never;
 type DEBUG_9 = DEBUG extends true ? '9' : never;
 
-type FormElementType = 'control' | 'group' | 'array' | 'arrays';
+type FormElementType = 'control' | 'group' | 'array';
 
 type PrepareAnnotationsObj<T> = {
   [key in keyof T]?:
-    NonNullable<T[key]> extends Array<infer U>
-      ? | PrepareAnnotationsObj<U>
+    T[key] extends Array<infer U>
+      ? (
+        | PrepareAnnotationsObj<U>
         | Array<PrepareAnnotationsObj<U>>
         | FormElementType
-      : NonNullable<T[key]> extends Record<string, any>
-        ? PrepareAnnotationsObj<NonNullable<T[key]>> | FormElementType
+      )
+      : T[key] extends Record<string, any>
+        ? (PrepareAnnotationsObj<T[key]> | FormElementType)
         : FormElementType;
 };
 
