@@ -31,11 +31,17 @@ type PrepareAnnotationsObj<T> = {
     T[key] extends Array<infer U>
       ? (
         | PrepareAnnotationsObj<U>
-        | Array<PrepareAnnotationsObj<U>>
         | FormElementType
+        | [PrepareAnnotationsObj<U>]
+        | [FormElementType]
       )
       : T[key] extends Record<string, any>
-        ? (PrepareAnnotationsObj<T[key]> | FormElementType)
+        ? (
+          | PrepareAnnotationsObj<T[key]> 
+          | FormElementType
+          | [PrepareAnnotationsObj<T[key]>]
+          | [FormElementType]
+        )
         : FormElementType;
 };
 

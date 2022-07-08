@@ -87,6 +87,30 @@ describe('Test FormControlsOf annotations', () => {
         expect(form2.controls.a.controls[0].controls[0].value).toStrictEqual(42);
     })
 
+    it('group inside array', () => {
+        interface ArrayOfGroups {
+            a: Array<{ b: number }>;
+        }
+
+        const fb = new FormBuilder();
+
+        // Empty form
+        const form1: FormGroup<FormControlsOf<ArrayOfGroups, { a: ['group'] }>> = fb.group({
+            a: fb.array<FormGroup<{ b: FormControl<number | null> }>>([])
+        })
+
+        expect(form1.value.a).toStrictEqual([]);
+        expect(form1.controls.a.value).toStrictEqual([]);
+
+        // Filled form
+        const form2: FormGroup<FormControlsOf<ArrayOfGroups, { a: ['group'] }>> = fb.group({
+            a: fb.array([fb.group({ b: [42] })])
+        })
+
+        expect(form2.value.a![0].b).toStrictEqual(42);
+        expect(form2.controls.a.controls[0].controls.b.value).toStrictEqual(42);
+    })
+
     it('array inside group', () => {
         interface ArrayInsideGroup {
             a: {
@@ -119,36 +143,6 @@ describe('Test FormControlsOf annotations', () => {
         expect(form2.controls.a.controls.b.controls[0].value).toStrictEqual(42);
     })
 
-    it('group inside array', () => {
-        interface GroupInsideArray {
-            a: Array<{ b: { c: number } }>
-        }
-
-        const fb = new FormBuilder();
-
-        // Empty form
-        const form1: FormGroup<FormControlsOf<GroupInsideArray, { a: [{ b: 'group' }] }>> = fb.group({
-            a: fb.array<FormGroup<{ b: FormGroup<{ c: FormControl<number | null> }> }>>([])
-        })
-
-        expect(form1.value.a).toStrictEqual([]);
-        expect(form1.controls.a.value).toStrictEqual([]);
-
-        // Filled form
-        const form2: FormGroup<FormControlsOf<GroupInsideArray, { a: [{ b: 'group' }] }>> = fb.group({
-            a: fb.array([
-                fb.group({
-                    b: fb.group({
-                        c: [42]
-                    })
-                })
-            ])
-        })
-
-        expect(form2.value.a![0].b?.c).toStrictEqual(42);
-        expect(form2.controls.a.controls[0].controls.b.controls.c.value).toStrictEqual(42);
-    })
-
     it('group inside group', () => {
         interface GroupInsideGroup {
             a: {
@@ -171,6 +165,37 @@ describe('Test FormControlsOf annotations', () => {
         expect(form.value.a?.b?.c).toBe(42);
         expect(form.controls.a.controls.b.controls.c.value).toBe(42);
     })
+
+    it('group inside group inside array', () => {
+        interface GroupInsideGroupInsideArray {
+            a: Array<{ b: { c: number } }>
+        }
+
+        const fb = new FormBuilder();
+
+        // Empty form
+        const form1: FormGroup<FormControlsOf<GroupInsideGroupInsideArray, { a: [{ b: 'group' }] }>> = fb.group({
+            a: fb.array<FormGroup<{ b: FormGroup<{ c: FormControl<number | null> }> }>>([])
+        })
+
+        expect(form1.value.a).toStrictEqual([]);
+        expect(form1.controls.a.value).toStrictEqual([]);
+
+        // Filled form
+        const form2: FormGroup<FormControlsOf<GroupInsideGroupInsideArray, { a: [{ b: 'group' }] }>> = fb.group({
+            a: fb.array([
+                fb.group({
+                    b: fb.group({
+                        c: [42]
+                    })
+                })
+            ])
+        })
+
+        expect(form2.value.a![0].b?.c).toStrictEqual(42);
+        expect(form2.controls.a.controls[0].controls.b.controls.c.value).toStrictEqual(42);
+    })
+
 
     it('group inside array inside group', () => {
         interface DeepGroup {
