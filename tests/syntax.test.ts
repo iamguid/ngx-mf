@@ -1,6 +1,6 @@
 import "@angular/compiler";
 
-import { FormArray, FormBuilder, FormControl, FormGroup } from "@angular/forms"
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
 import { FormControlsOf } from ".."
 
 interface SimpleModel {
@@ -114,5 +114,71 @@ describe('Test different form definition syntax', () => {
             expect(form.value.a![0]).toBe(42);
             expect(form.controls.a.controls[0].value).toBe(42);
         })
+    })
+
+    describe('from with validators', () => {
+        it('constructor syntax', () => {
+            const form: FormGroup<FormControlsOf<SimpleModel>> = new FormGroup({
+                a: new FormControl(42, [Validators.required])
+            })
+
+            expect(form.value.a).toBe(42);
+            expect(form.controls.a.value).toBe(42);
+        })
+
+        it('FormBuilder syntax', () => {
+            const fb = new FormBuilder();
+
+            const form: FormGroup<FormControlsOf<SimpleModel>> = fb.group({
+                a: fb.control(42, [Validators.required])
+            })
+
+            expect(form.value.a).toBe(42);
+            expect(form.controls.a.value).toBe(42);
+        })
+
+        it('array syntax', () => {
+            const fb = new FormBuilder();
+
+            const form: FormGroup<FormControlsOf<SimpleModel>> = fb.group({
+                a: [42, [Validators.required]]
+            })
+
+            expect(form.value.a).toBe(42);
+            expect(form.controls.a.value).toBe(42);
+        })
+    })
+
+    describe('value as FormControlState', () => {
+        it('constructor syntax', () => {
+            const form: FormGroup<FormControlsOf<SimpleModel>> = new FormGroup({
+                a: new FormControl({ value: 42, disabled: false })
+            })
+
+            expect(form.value.a).toBe(42);
+            expect(form.controls.a.value).toBe(42);
+        })
+
+        it('FormBuilder syntax', () => {
+            const fb = new FormBuilder();
+
+            const form: FormGroup<FormControlsOf<SimpleModel>> = fb.group({
+                a: fb.control({ value: 42, disabled: false })
+            })
+
+            expect(form.value.a).toBe(42);
+            expect(form.controls.a.value).toBe(42);
+        })
+
+        // it('array syntax', () => {
+        //     const fb = new FormBuilder();
+
+        //     const form: FormGroup<FormControlsOf<SimpleModel>> = fb.group({
+        //         a: [{ value: 42, disabled: false }]
+        //     })
+
+        //     expect(form.value.a).toBe(42);
+        //     expect(form.controls.a.value).toBe(42);
+        // })
     })
 })
