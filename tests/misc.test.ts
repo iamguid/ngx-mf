@@ -1,6 +1,6 @@
 import "@angular/compiler";
 
-import { FormBuilder } from "@angular/forms";
+import { FormBuilder, FormGroup } from "@angular/forms";
 import { FormModel } from "..";
 
 describe('Misc tests', () => {
@@ -33,6 +33,23 @@ describe('Misc tests', () => {
 
         expect(form.value.b).toBe(42);
         expect(form.controls.b.value).toBe(42);
+    })
+
+    it.skip('non nullable FormControl', () => {
+        interface Model {
+            a: number;
+        }
+
+        const fb = new FormBuilder();
+
+        // It doesn't work :(
+        //
+        // @ts-ignore
+        const form: FormModel<Model> = fb.group({
+            b: fb.control(42, { nonNullable: true })
+        })
+
+        expect(form.value.a)
     })
 
     it('complex form', () => {

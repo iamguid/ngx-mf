@@ -254,3 +254,37 @@ Now let's say that `c.d.e` should be `FormArray`
 >     }>;
 > }>
 > ```
+
+## Questions
+
+> Q: Why i cannot just use `FormGroup<Model>` ?
+> 
+> A: see [/tests/pure-angular-forms.test.ts (example 1)](https://github.com/iamguid/ngx-mf/blob/master/tests/pure-angular-forms.test.ts)
+
+> Q: Why i cannot define form as `FormGroup` ?
+> 
+> A: Because you loose your types, see [/tests/type-lose.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/type-lose.ts)
+
+> Q: Why i cannot define forms without binding
+> it to model type ?
+> 
+> A: Yes you can, but it's more usefull to bind it
+
+> Q: Why i cannot init form when define it and use
+> `typeof` to infer form type?
+> 
+> A: Yes you can, it is another way to save form type
+> and you can use `typeof` to get type of form,
+> to pass it to the method, see [/test/define-when-init.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/define-when-init.ts),
+> but when your model will change then you will see
+> errors only in the places where you use `patch`
+> or `setValue` or thomething like that,
+> i think it is inderect errors, but when you bind
+> forms to models you see errors on the form definition
+
+> Q: What about dynamically forms ?
+> 
+> A: It's just lib and you can use it or not, but i think
+> in most cases forms will be based on some interfaces
+> or models and nevertheless you can try to define
+> your forms based on your interfaces
