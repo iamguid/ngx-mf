@@ -264,12 +264,6 @@ Now let's say that `c.d.e` should be `FormArray`
 > ```typescript
 > type Form = FormModel<number[]>
 > ```
->
-> it's equvivalent to 
->
-> ```typescript
-> type Form = FormModel<number[], 'array'>
-> ```
 > 
 > would be
 >

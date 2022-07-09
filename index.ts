@@ -11,19 +11,20 @@ export type FormModel<
   TPreparedModel extends PrepareModel<TModel> = PrepareModel<TModel>
 > = TModel extends Array<any>
   ? FormControlsOfInner<TPreparedModel, true, false, TPreparedAnnotations>
+  // @ts-ignore
   : FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>;
 
 // Types for debugging output
 type DEBUG = false;
-type DEBUG_1 = DEBUG extends true ? '1' : never;
-type DEBUG_2 = DEBUG extends true ? '2' : never;
-type DEBUG_3 = DEBUG extends true ? '3' : never;
-type DEBUG_4 = DEBUG extends true ? '4' : never;
-type DEBUG_5 = DEBUG extends true ? '5' : never;
-type DEBUG_6 = DEBUG extends true ? '6' : never;
-type DEBUG_7 = DEBUG extends true ? '7' : never;
-type DEBUG_8 = DEBUG extends true ? '8' : never;
-type DEBUG_9 = DEBUG extends true ? '9' : never;
+type DEBUG_1 = DEBUG extends true ? '1' : unknown;
+type DEBUG_2 = DEBUG extends true ? '2' : unknown;
+type DEBUG_3 = DEBUG extends true ? '3' : unknown;
+type DEBUG_4 = DEBUG extends true ? '4' : unknown;
+type DEBUG_5 = DEBUG extends true ? '5' : unknown;
+type DEBUG_6 = DEBUG extends true ? '6' : unknown;
+type DEBUG_7 = DEBUG extends true ? '7' : unknown;
+type DEBUG_8 = DEBUG extends true ? '8' : unknown;
+type DEBUG_9 = DEBUG extends true ? '9' : unknown;
 
 // Form element types for annotations
 type FormElementType = 'control' | 'group' | 'array';
@@ -46,7 +47,7 @@ type PrepareAnnotations<T> = {
           | [FormElementType]
         )
       : FormElementType
-} | FormElementType;
+};
 
 // Remove all nulls and undefined from T recursively
 type PrepareModel<T> = {
@@ -129,6 +130,7 @@ type FormControlsOfInner<
           // @ts-ignore
           : TPreparedAnnotations[key] extends Array<infer Z>
             ? TPreparedModel[key] extends Array<infer U>
+              // @ts-ignore
               ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
               : DEBUG_2
 
@@ -141,6 +143,7 @@ type FormControlsOfInner<
           // @ts-ignore
           : TPreparedAnnotations[key] extends Record<string, any>
             ? TPreparedModel[key] extends Record<string, any>
+              // @ts-ignore
               ? FormGroup<FormControlsOfInner<TPreparedModel[key], TNullable, true, TPreparedAnnotations[key]>>
               : DEBUG_3
 
@@ -199,6 +202,7 @@ type FormControlsOfInner<
       // then infer FormArray type recursively
       : TPreparedAnnotations extends Array<infer Z>
         ? TPreparedModel extends Array<infer U>
+          // @ts-ignore
           ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
           : DEBUG_6
 
@@ -209,6 +213,7 @@ type FormControlsOfInner<
       // then infer FormGroup type recursively
       : TPreparedAnnotations extends Record<string, any>
         ? TPreparedModel extends Record<string, any>
+          // @ts-ignore
           ? FormGroup<FormControlsOfInner<TPreparedModel, TNullable, true, TPreparedAnnotations>>
           : DEBUG_7
 

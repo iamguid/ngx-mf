@@ -34,17 +34,10 @@ describe('Test FormControlsOf annotations', () => {
 
         const fb = new FormBuilder();
 
-        // Define annotation
-        const form1: FormModel<Model, 'array'> = fb.array([42])
+        const form: FormModel<Model> = fb.array([42])
 
-        expect(form1.value[0]).toBe(42);
-        expect(form1.controls[0].value).toBe(42);
-
-        // Without annotation
-        const form2: FormModel<Model> = fb.array([42])
-
-        expect(form2.value[0]).toBe(42);
-        expect(form2.controls[0].value).toBe(42);
+        expect(form.value[0]).toBe(42);
+        expect(form.controls[0].value).toBe(42);
     })
 
     it('group', () => {
@@ -54,17 +47,10 @@ describe('Test FormControlsOf annotations', () => {
 
         const fb = new FormBuilder();
 
-        // Define annotation
-        const form1: FormModel<Model, 'group'> = fb.group({ a: [42] })
+        const form: FormModel<Model> = fb.group({ a: [42] })
 
-        expect(form1.value.a).toBe(42);
-        expect(form1.controls.a.value).toBe(42);
-
-        // Without annotation
-        const form2: FormModel<Model> = fb.group({ a: [42] })
-
-        expect(form2.value.a).toBe(42);
-        expect(form2.controls.a.value).toBe(42);
+        expect(form.value.a).toBe(42);
+        expect(form.controls.a.value).toBe(42);
     })
 
     it('array inside group', () => {
