@@ -114,7 +114,7 @@ describe('Misc tests', () => {
         expect(form2.value.b![0]).toBe('test');
         expect(form2.value.c?.d?.e![0]).toBe(43);
         expect(form2.value.c?.f?.g).toBe('test');
-12
+
         expect(form2.controls.a.value).toBe(42);
         expect(form2.controls.b.controls[0].value).toBe('test');
         expect(form2.controls.c.value).toStrictEqual({
