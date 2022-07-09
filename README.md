@@ -256,6 +256,40 @@ Now let's say that `c.d.e` should be `FormArray`
 > }>
 > ```
 
+---
+
+> If you pass array type to FormModel then you get FormArray
+> instead of FormGroup
+>
+> ```typescript
+> type Form = FormModel<number[]>
+> ```
+>
+> it's equvivalent to 
+>
+> ```typescript
+> type Form = FormModel<number[], 'array'>
+> ```
+> 
+> would be
+>
+> ```typescript
+> FormArray<FormControl<number>>
+> ```
+
+> Also you can define FormArray recursively like group inside array inside array :)
+> ```typescript
+> type Form = FormModel<SomeModel, [['group']]>
+> ```
+
+> Or array inside group inside array for example:
+> 
+> ```typescript
+> type Form = FormModel<SomeModel, [{a: 'array'}]>
+> ```
+
+Other examples you can find in annotation tests [/tests/annotation.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotation.test.ts)
+
 ## Questions
 
 > Q: Why i cannot just use `FormGroup<Model>` ?
