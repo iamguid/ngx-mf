@@ -72,13 +72,13 @@ type FormControlUtil<T, TNullable extends boolean> = FormControl<
 type FormControlsOfInner<
   TPreparedObj extends Record<string, any> | Array<any>,
   TNullable extends boolean,
-  TTraverseObj extends boolean,
+  TKeyofTraverse extends boolean,
   TPreparedAnnotationsObj extends PrepareAnnotationsObj<TPreparedObj> | null
 > =
-  // When TTraverseObj is true
+  // When TKeyofTraverse is true
   //
-  // Traverse every key in object and transform it to form element
-  TTraverseObj extends true
+  // Traverse every key in object and transform it to form element recursive
+  TKeyofTraverse extends true
 
     // When annotations is not set
     //
@@ -92,6 +92,7 @@ type FormControlsOfInner<
           // If we have 'array' string in annotation
           // and current object is record type
           // then infer FormArray type recursively
+          //
           // @ts-ignore
           TPreparedAnnotationsObj[key] extends 'array'
             ? TPreparedObj[key] extends Array<infer U>
@@ -145,13 +146,13 @@ type FormControlsOfInner<
 
           // FormControl as default
           //
-          // Otherwise infer FormControl type base on current object type
+          // Otherwise infer FormControl type based on current object type
           : FormControlUtil<TPreparedObj[key], TNullable>;
     }
 
-    // When TTraverseObj is false
+    // When TKeyofTraverse is false
     //
-    // Infer type of current object as form element type
+    // Infer type of current object as form element type recursively
     :
 
       // When annotations is not set

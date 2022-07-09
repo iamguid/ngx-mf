@@ -19,7 +19,7 @@ describe('User form example', () => {
             id: number;
             firstName: string;
             lastName: string;
-            nick: string;
+            nickname: string;
             birthday: Date;
             contacts: IContactModel[];
         }
@@ -29,7 +29,7 @@ describe('User form example', () => {
         const form: UserForm = new FormGroup({
             firstName: new FormControl<string | null>(null),
             lastName: new FormControl<string | null>(null),
-            nick: new FormControl<string | null>(null),
+            nickname: new FormControl<string | null>(null),
             birthday: new FormControl<Date | null>(null),
             contacts: new FormArray<FormModel<IContactModel>>([]),
         });
@@ -37,7 +37,7 @@ describe('User form example', () => {
         const value: Omit<IUserModel, 'id'> = {
             firstName: 'Vladislav',
             lastName: 'Lebedev',
-            nick: 'iam.guid',
+            nickname: 'iam.guid',
             birthday: new Date('022-07-07T17:10:03.102Z'),
             contacts: [{
                 type: ContactType.Email,
