@@ -1,7 +1,6 @@
 # ngx-mf
 `ngx-mf` is zero dependency set of types for infer
-angular FormGroup type from model type.
-That means you can bind your models type with form type.
+angular `FormGroup` type from model type.
 
 It doesn't increase your bundle size because it's just
 TypeScript types.
@@ -26,9 +25,11 @@ $ yarn add ngx-mf --dev
 
 `ngx-mf` exports type `FormModel`
 
-`FormModel<TModel, TAnnotation>` - This is the type that recursively turns TModel (where TModel is your model type) into a FormGroup.
-You can choose what you want: FormGroup or FormArray by annotations.
-You can pass TAnnotation as the second argument and specify
+`FormModel<TModel, TAnnotations>` - This is the type
+that recursively turns `TModel` (where `TModel` is your model type)
+into a `FormGroup`.
+You can choose what you want: `FormGroup` or `FormArray` by annotations.
+You can pass `TAnnotations` as the second argument and specify
 output type, you should use special syntax to do it.
 
 For example we have some model like this:
@@ -47,7 +48,7 @@ interface IUserModel {
 Lets say we want, for example, infer FormGroup where
 fields `firstName`, `lastName`, `nickname`, `birthday`
 should be `FormControl` and field `contacts` should be
-FormArray of FormGroups.
+`FormArray` of `FormGroups`.
 
 First of all we need to exclude `id` from our model,
 it is needed because all fields are required.
@@ -58,8 +59,8 @@ should omit or pick them from source model.
 Omit<IUserModel, 'id'>
 ```
 
-Then we want to specify `contacts` as FormArray and specify
-every contact as FormGroup, so we need to pass annotation
+Then we want to specify `contacts` as `FormArray` and specify
+every contact as `FormGroup`, so we need to pass annotation
 in our `FormModel` type. The syntax of annotation would
 be like that:
 
@@ -69,7 +70,7 @@ be like that:
 
 Where `contacts` is our field, `['group']` indicates that
 field is `FormArray`, `'group'` indicates that we have
-FormGroup inside FormArray.
+`FormGroup` inside `FormArray`.
 
 So our full `UserForm` type should be:
 ```typescript
@@ -83,9 +84,9 @@ here [/tests/example.test.ts](https://github.com/iamguid/ngx-mf/blob/master/test
 `ngx-mf` annotations have three different keywords: `array`,
 `group` and `control`
 
-* `array` - infer FormArray
-* `group` - infer FormGroup
-* `control` - infer FormControl
+* `array` - infer `FormArray`
+* `group` - infer `FormGroup`
+* `control` - infer `FormControl`
 
 Also annotations can be objects like `{a: 'group'}`,
 and arrays like `['group']`.
@@ -93,8 +94,8 @@ and arrays like `['group']`.
 And you can combine `{}`, `[]`, `'array'`, `'group'`, `'control'`
 to specify what you want.
 
-If you use `{}` then object with the same nesting will be FormGroup
-If you use `[]` then object with the same nesting will be FormArray
+If you use `{}` then object with the same nesting will be `FormGroup`
+If you use `[]` then object with the same nesting will be `FormArray`
 
 ## Examples Of Usage
 
