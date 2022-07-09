@@ -26,7 +26,7 @@ $ yarn add ngx-mf --dev
 
 `ngx-mf` exports type `FormModel`
 
-`FormModel<TObj, TAnnotation>` - This is the type that recursively turns TObj (where TObj is your model type) into a FormGroup.
+`FormModel<TModel, TAnnotation>` - This is the type that recursively turns TModel (where TModel is your model type) into a FormGroup.
 You can choose what you want: FormGroup or FormArray by annotations.
 You can pass TAnnotation as the second argument and specify
 output type, you should use special syntax to do it.

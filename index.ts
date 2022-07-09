@@ -2,16 +2,16 @@ import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 // Main type
 //
-// If TObj is array
+// If TModel is array
 // then infer FormArray recursively
 // else infer FormGroup recursively
 export type FormModel<
-  TObj extends Record<string, any> | Array<any>,
-  TPreparedAnnotationsObj extends PrepareAnnotationsObj<TPreparedObj> | null = null,
-  TPreparedObj extends PrepareObj<TObj> = PrepareObj<TObj>
-> = TObj extends Array<any>
-  ? FormControlsOfInner<TPreparedObj, true, false, TPreparedAnnotationsObj>
-  : FormGroup<FormControlsOfInner<TPreparedObj, true, true, TPreparedAnnotationsObj>>;
+  TModel extends Record<string, any> | Array<any>,
+  TPreparedAnnotations extends PrepareAnnotations<TPreparedModel> | null = null,
+  TPreparedModel extends PrepareModel<TModel> = PrepareModel<TModel>
+> = TModel extends Array<any>
+  ? FormControlsOfInner<TPreparedModel, true, false, TPreparedAnnotations>
+  : FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>;
 
 // Types for debugging output
 type DEBUG = false;
@@ -29,32 +29,32 @@ type DEBUG_9 = DEBUG extends true ? '9' : never;
 type FormElementType = 'control' | 'group' | 'array';
 
 // Convert T to annotations type recursively
-type PrepareAnnotationsObj<T> = {
+type PrepareAnnotations<T> = {
   [key in keyof T]?:
     T[key] extends Array<infer U>
       ? (
-        | PrepareAnnotationsObj<U>
+        | PrepareAnnotations<U>
         | FormElementType
-        | [PrepareAnnotationsObj<U>]
+        | [PrepareAnnotations<U>]
         | [FormElementType]
       )
       : T[key] extends Record<string, any>
         ? (
-          | PrepareAnnotationsObj<T[key]> 
+          | PrepareAnnotations<T[key]> 
           | FormElementType
-          | [PrepareAnnotationsObj<T[key]>]
+          | [PrepareAnnotations<T[key]>]
           | [FormElementType]
         )
       : FormElementType
 } | FormElementType;
 
 // Remove all nulls and undefined from T recursively
-type PrepareObj<T> = {
+type PrepareModel<T> = {
   [key in keyof T]-?: 
     NonNullable<T[key]> extends (infer U)[]
-      ? PrepareObj<NonNullable<U>>[]
+      ? PrepareModel<NonNullable<U>>[]
       : NonNullable<T[key]> extends Record<string, any>
-        ? PrepareObj<NonNullable<T[key]>>
+        ? PrepareModel<NonNullable<T[key]>>
         : NonNullable<T[key]>;
 };
 
@@ -65,15 +65,15 @@ type FormArrayUtil<T, TNullable extends boolean> =
 
 type FormControlUtil<T, TNullable extends boolean> = FormControl<
   TNullable extends true
-    ? ((T extends object ? (T extends PrepareObj<infer U> ? U : T) : T) | null)
-    : (T extends object ? (T extends PrepareObj<infer U> ? U : T) : T)
+    ? ((T extends object ? (T extends PrepareModel<infer U> ? U : T) : T) | null)
+    : (T extends object ? (T extends PrepareModel<infer U> ? U : T) : T)
 >;
 
 type FormControlsOfInner<
-  TPreparedObj extends Record<string, any> | Array<any>,
+  TPreparedModel extends Record<string, any> | Array<any>,
   TNullable extends boolean,
   TKeyofTraverse extends boolean,
-  TPreparedAnnotationsObj extends PrepareAnnotationsObj<TPreparedObj> | null
+  TPreparedAnnotations extends PrepareAnnotations<TPreparedModel> | null
 > =
   // When TKeyofTraverse is true
   //
@@ -83,10 +83,10 @@ type FormControlsOfInner<
     // When annotations is not set
     //
     // If we dont have annotations then every nested value in object is FormControl 
-    ? TPreparedAnnotationsObj extends null
-      ? { [key in keyof TPreparedObj]-?: FormControlUtil<TPreparedObj[key], TNullable>; }
+    ? TPreparedAnnotations extends null
+      ? { [key in keyof TPreparedModel]-?: FormControlUtil<TPreparedModel[key], TNullable>; }
       : {
-        [key in keyof TPreparedObj]-?: 
+        [key in keyof TPreparedModel]-?: 
           // FormArray string annotation
           //
           // If we have 'array' string in annotation
@@ -94,9 +94,9 @@ type FormControlsOfInner<
           // then infer FormArray type recursively
           //
           // @ts-ignore
-          TPreparedAnnotationsObj[key] extends 'array'
-            ? TPreparedObj[key] extends Array<infer U>
-              ? FormArrayUtil<TPreparedObj[key], TNullable>
+          TPreparedAnnotations[key] extends 'array'
+            ? TPreparedModel[key] extends Array<infer U>
+              ? FormArrayUtil<TPreparedModel[key], TNullable>
               : DEBUG_4
 
           // FormGroup string annotation
@@ -106,9 +106,9 @@ type FormControlsOfInner<
           // then infer FormGroup type recursively
           //
           // @ts-ignore
-          : TPreparedAnnotationsObj[key] extends 'group'
-            ? TPreparedObj[key] extends Record<string, any>
-              ? FormGroup<FormControlsOfInner<TPreparedObj[key], TNullable, true, null>>
+          : TPreparedAnnotations[key] extends 'group'
+            ? TPreparedModel[key] extends Record<string, any>
+              ? FormGroup<FormControlsOfInner<TPreparedModel[key], TNullable, true, null>>
               : DEBUG_5
 
           // FormControl string annotation
@@ -117,8 +117,8 @@ type FormControlsOfInner<
           // then infer FormControl type
           //
           // @ts-ignore
-          : TPreparedAnnotationsObj[key] extends 'control'
-            ? FormControlUtil<TPreparedObj[key], TNullable>
+          : TPreparedAnnotations[key] extends 'control'
+            ? FormControlUtil<TPreparedModel[key], TNullable>
 
           // FormArray type annotation
           //
@@ -127,8 +127,8 @@ type FormControlsOfInner<
           // then infer FormArray type recursively
           //
           // @ts-ignore
-          : TPreparedAnnotationsObj[key] extends Array<infer Z>
-            ? TPreparedObj[key] extends Array<infer U>
+          : TPreparedAnnotations[key] extends Array<infer Z>
+            ? TPreparedModel[key] extends Array<infer U>
               ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
               : DEBUG_2
 
@@ -139,15 +139,15 @@ type FormControlsOfInner<
           // then infer FormGroup type recursively
           //
           // @ts-ignore
-          : TPreparedAnnotationsObj[key] extends Record<string, any>
-            ? TPreparedObj[key] extends Record<string, any>
-              ? FormGroup<FormControlsOfInner<TPreparedObj[key], TNullable, true, TPreparedAnnotationsObj[key]>>
+          : TPreparedAnnotations[key] extends Record<string, any>
+            ? TPreparedModel[key] extends Record<string, any>
+              ? FormGroup<FormControlsOfInner<TPreparedModel[key], TNullable, true, TPreparedAnnotations[key]>>
               : DEBUG_3
 
           // FormControl as default
           //
           // Otherwise infer FormControl type based on current object type
-          : FormControlUtil<TPreparedObj[key], TNullable>;
+          : FormControlUtil<TPreparedModel[key], TNullable>;
     }
 
     // When TKeyofTraverse is false
@@ -160,19 +160,19 @@ type FormControlsOfInner<
       // If we dont have annotations then
       //   if current object is Array infer FormArray recursively
       //   else infer FormControl 
-      TPreparedAnnotationsObj extends null
-        ? TPreparedObj extends Array<infer U>
+      TPreparedAnnotations extends null
+        ? TPreparedModel extends Array<infer U>
           ? FormArray<FormControlsOfInner<U, TNullable, false, null>>
-          : FormControlUtil<TPreparedObj, TNullable>
+          : FormControlUtil<TPreparedModel, TNullable>
 
       // FormArray string annotation
       //
       // If we have 'array' string in annotation 
       // and current object is array type 
       // then infer FormArray type recursively
-      : TPreparedAnnotationsObj extends 'array'
-        ? TPreparedObj extends Array<any>
-          ? FormArrayUtil<TPreparedObj, TNullable>
+      : TPreparedAnnotations extends 'array'
+        ? TPreparedModel extends Array<any>
+          ? FormArrayUtil<TPreparedModel, TNullable>
           : DEBUG_8
 
       // FormGroup string annotation
@@ -180,25 +180,25 @@ type FormControlsOfInner<
       // If we have 'group' string in annotation
       // and current object is record type
       // then infer FormGroup type recursively
-      : TPreparedAnnotationsObj extends 'group'
-        ? TPreparedObj extends Record<string, any>
-          ? FormGroup<FormControlsOfInner<TPreparedObj, TNullable, true, null>>
+      : TPreparedAnnotations extends 'group'
+        ? TPreparedModel extends Record<string, any>
+          ? FormGroup<FormControlsOfInner<TPreparedModel, TNullable, true, null>>
           : DEBUG_9
 
       // FormControl string annotation
       //
       // If we have 'control' string in annotation
       // then infer FormControl type
-      : TPreparedAnnotationsObj extends 'control'
-        ? FormControlUtil<TPreparedObj, TNullable>
+      : TPreparedAnnotations extends 'control'
+        ? FormControlUtil<TPreparedModel, TNullable>
       
       // FormArray type annotation
       //
       // If we have array type in annotation
       // and current object is array type
       // then infer FormArray type recursively
-      : TPreparedAnnotationsObj extends Array<infer Z>
-        ? TPreparedObj extends Array<infer U>
+      : TPreparedAnnotations extends Array<infer Z>
+        ? TPreparedModel extends Array<infer U>
           ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
           : DEBUG_6
 
@@ -207,12 +207,12 @@ type FormControlsOfInner<
       // If we have record type in annotation
       // and current object is record type
       // then infer FormGroup type recursively
-      : TPreparedAnnotationsObj extends Record<string, any>
-        ? TPreparedObj extends Record<string, any>
-          ? FormGroup<FormControlsOfInner<TPreparedObj, TNullable, true, TPreparedAnnotationsObj>>
+      : TPreparedAnnotations extends Record<string, any>
+        ? TPreparedModel extends Record<string, any>
+          ? FormGroup<FormControlsOfInner<TPreparedModel, TNullable, true, TPreparedAnnotations>>
           : DEBUG_7
 
       // FormControl as default
       //
       // Otherwise infer FormControl type based on current object type
-      : FormControlUtil<TPreparedObj, TNullable>;
+      : FormControlUtil<TPreparedModel, TNullable>;
