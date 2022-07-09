@@ -135,24 +135,7 @@ Lets see what `FormModel` will do without annotations
 > type Form = FormModel<Model>
 > ```
 
-> Inferred `Form` type:
-> 
-> ```typescript
-> FormGroup<{
->     a: FormControlUtil<number, true>;
->     b: FormControlUtil<string[], true>;
->     c: FormControlUtil<PrepareObj<{
->         d: {
->             e: number[];
->         };
->         f: {
->             g: string;
->         };
->     }>, true>;
-> }>
-> ```
-
-> Inferred angular `Form` type
+> Inferred `Form` type
 > 
 > ```typescript
 > FormGroup<{
@@ -181,24 +164,7 @@ Now we say that `b` should be `FormArray`
 > type Form = FormModel<Model, { b: 'array' }>
 > ```
 
-> Inferred `Form` type:
-> 
-> ```typescript
-> FormGroup<{
->     a: FormControlUtil<number, true>;
->     b: FormArray<FormControl<string | null>>; // <<
->     c: FormControlUtil<PrepareObj<{
->         d: {
->             e: number[];
->         };
->         f: {
->             g: string;
->         };
->     }>, true>;
-> }>
-> ```
-
-> Inferred angular `FormGroup` type
+> Inferred `Form` type
 > 
 > ```typescript
 > FormGroup<{
@@ -225,24 +191,7 @@ Now we say that `c` should be `FormGroup`
 > type Form = FormModel<Model, { c: 'group' }>
 > ```
  
-> Inferred `Form` type:
-> 
-> ```typescript
-> FormGroup<{
->     a: FormControlUtil<number, true>;
->     b: FormControlUtil<string[], true>;
->     c: FormGroup<{ // <<
->         d: FormControlUtil<PrepareObj<{
->             e: number[];
->         }>, true>;
->         f: FormControlUtil<PrepareObj<{
->             g: string;
->         }>, true>;
->     }>;
-> }>
-> ```
-
-> Inferred angular `FormGroup` type
+> Inferred `Form` type
 > 
 > ```typescript
 > FormGroup<{
@@ -269,24 +218,7 @@ Now we say that `c.f` should be `FormGroup`
 > type Form = FormModel<Model, { c: { f: 'group' } }>
 > ```
  
-> Inferred `Form` type:
-> 
-> ```typescript
-> FormGroup<{
->     a: FormControlUtil<number, true>;
->     b: FormControlUtil<string[], true>;
->     c: FormGroup<{ // <<
->         d: FormControlUtil<PrepareObj<{
->             e: number[];
->         }>, true>;
->         f: FormGroup<{ // <<
->             g: FormControlUtil<string, true>;
->         }>;
->     }>;
-> }>
-> ```
-
-> Inferred angular `FormGroup` type
+> Inferred `Form` type
 > 
 > ```typescript
 > FormGroup<{
@@ -313,24 +245,7 @@ Now we say that `c.f` should be `FormGroup`
 > type Form = FormModel<Model, { c: { d: { e: 'array' } } }>
 > ```
 
-> Inferred `Form` type:
-> 
-> ```typescript
-> FormGroup<{
->     a: FormControlUtil<number, true>;
->     b: FormControlUtil<string[], true>;
->     c: FormGroup<{ // <<
->         d: FormGroup<{ // <<
->             e: FormArray<FormControl<number | null>>; // <<
->         }>;
->         f: FormControlUtil<PrepareObj<{
->             g: string;
->         }>, true>;
->     }>;
-> }>
-> ```
-
-> Inferred angular `FormGroup` type
+> Inferred `Form` type
 > 
 > ```typescript
 > FormGroup<{
