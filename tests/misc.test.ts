@@ -224,4 +224,37 @@ describe('Misc tests', () => {
         expect(form6.controls.c.controls.d.controls.e.value![0]).toBe(43);
         expect(form6.controls.c.controls.f.controls.g.value).toBe('test');
     })
+
+    it('bubbling', () => {
+        interface Model {
+            a: {
+                b: {
+                    c: number;
+                }
+            },
+            d: {
+                e: {
+                    f: number
+                }
+            }
+        }
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model, { a: { b: 'group' }, d: { e: 'group' } }> = fb.group({
+            a: fb.group({
+                b: fb.group({
+                    c: [42]
+                })
+            }),
+            d: fb.group({
+                e: fb.group({
+                    f: [42]
+                })
+            })
+        })
+
+        expect(form.value.a?.b?.c).toBe(42);
+        expect(form.value.d?.e?.f).toBe(42);
+    })
 })
