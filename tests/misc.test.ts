@@ -38,23 +38,147 @@ describe('Misc tests', () => {
     it('complex form', () => {
         interface Model {
             a: number;
-            b: number[];
+            b: string[];
             c: {
                 d: {
-                    e: number;
+                    e: number[];
                 }
                 f: {
                     g: string;
-                }
-                h: {
-                    i: Date;
                 }
             }
         }
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, {
+        const form1: FormModel<Model> = fb.group({
+            a: [42],
+            b: [['test']],
+            c: [{
+                d: {
+                    e: [43],
+                },
+                f: {
+                    g: 'test'
+                },
+            }]
+        });
+
+        expect(form1.value.a).toBe(42);
+        expect(form1.value.b![0]).toBe('test');
+        expect(form1.value.c?.d?.e![0]).toBe(43);
+        expect(form1.value.c?.f?.g).toBe('test');
+1
+        expect(form1.controls.a.value).toBe(42);
+        expect(form1.controls.b.value![0]).toBe('test');
+        expect(form1.controls.c.value).toStrictEqual({
+            d: {
+                e: [43],
+            },
+            f: {
+                g: 'test'
+            },
+        });
+
+        const form2: FormModel<Model, { b: 'array' }> = fb.group({
+            a: [42],
+            b: fb.array([['test']]),
+            c: [{
+                d: {
+                    e: [43],
+                },
+                f: {
+                    g: 'test'
+                },
+            }]
+        });
+
+        expect(form2.value.a).toBe(42);
+        expect(form2.value.b![0]).toBe('test');
+        expect(form2.value.c?.d?.e![0]).toBe(43);
+        expect(form2.value.c?.f?.g).toBe('test');
+12
+        expect(form2.controls.a.value).toBe(42);
+        expect(form2.controls.b.controls[0].value).toBe('test');
+        expect(form2.controls.c.value).toStrictEqual({
+            d: {
+                e: [43],
+            },
+            f: {
+                g: 'test'
+            },
+        });
+
+        const form3: FormModel<Model, { c: 'group' }> = fb.group({
+            a: [42],
+            b: [['test']],
+            c: fb.group({
+                d: {
+                    e: [43],
+                },
+                f: {
+                    g: 'test'
+                },
+            })
+        });
+
+        expect(form3.value.a).toBe(42);
+        expect(form3.value.b![0]).toBe('test');
+        expect(form3.value.c?.d?.e![0]).toBe(43);
+        expect(form3.value.c?.f?.g).toBe('test');
+3
+        expect(form3.controls.a.value).toBe(42);
+        expect(form3.controls.b?.value![0]).toBe('test');
+        expect(form3.controls.c.controls.d.value).toStrictEqual({ e: [43], });
+        expect(form3.controls.c.controls.f.value).toStrictEqual({ g: 'test' });
+                    
+        const form4: FormModel<Model, { c: { f: 'group' } }> = fb.group({
+            a: [42],
+            b: [['test']],
+            c: fb.group({
+                d: [{
+                    e: [43],
+                }],
+                f: fb.group({
+                    g: 'test'
+                }),
+            })
+        });
+
+        expect(form4.value.a).toBe(42);
+        expect(form4.value.b![0]).toBe('test');
+        expect(form4.value.c?.d?.e![0]).toBe(43);
+        expect(form4.value.c?.f?.g).toBe('test');
+34
+        expect(form4.controls.a.value).toBe(42);
+        expect(form4.controls.b?.value![0]).toBe('test');
+        expect(form4.controls.c.controls.d.value).toStrictEqual({ e: [43] });
+        expect(form4.controls.c.controls.f.controls.g.value).toBe('test');
+
+        const form5: FormModel<Model, { c: { d: { e: 'array' } } }> = fb.group({
+            a: [42],
+            b: [['test']],
+            c: fb.group({
+                d: fb.group({
+                    e: fb.array([[43]]),
+                }),
+                f: [{
+                    g: 'test'
+                }],
+            })
+        });
+
+        expect(form5.value.a).toBe(42);
+        expect(form5.value.b![0]).toBe('test');
+        expect(form5.value.c?.d?.e![0]).toBe(43);
+        expect(form5.value.c?.f?.g).toBe('test');
+345
+        expect(form5.controls.a.value).toBe(42);
+        expect(form5.controls.b?.value![0]).toBe('test');
+        expect(form5.controls.c.controls.d.controls.e.controls[0].value).toStrictEqual(43);
+        expect(form5.controls.c.controls.f.value).toStrictEqual({ g: 'test' });
+
+        const form6: FormModel<Model, {
             b: 'array',
             c: {
                 d: 'group',
@@ -62,34 +186,25 @@ describe('Misc tests', () => {
             },
         }> = fb.group({
             a: [42],
-            b: fb.array([[1], [2], [3]]),
+            b: fb.array([['test']]),
             c: fb.group({
                 d: fb.group({
-                    e: [43],
+                    e: [[43]],
                 }),
                 f: fb.group({
                     g: ['test']
                 }),
-                h: [{ 
-                    i: new Date('2022-07-08T13:21:05.951Z')
-                }],
             })
         })
 
-        expect(form.value.a).toBe(42);
-        expect(form.value.b![0]).toBe(1);
-        expect(form.value.b![1]).toBe(2);
-        expect(form.value.b![2]).toBe(3);
-        expect(form.value.c?.d?.e).toBe(43);
-        expect(form.value.c?.f?.g).toBe('test');
-        expect(form.value.c?.h).toStrictEqual({ i: new Date('2022-07-08T13:21:05.951Z') });
+        expect(form6.value.a).toBe(42);
+        expect(form6.value.b![0]).toBe('test');
+        expect(form6.value.c?.d?.e![0]).toBe(43);
+        expect(form6.value.c?.f?.g).toBe('test');
 
-        expect(form.controls.a.value).toBe(42);
-        expect(form.controls.b?.controls![0].value).toBe(1);
-        expect(form.controls.b?.controls![1].value).toBe(2);
-        expect(form.controls.b?.controls![2].value).toBe(3);
-        expect(form.controls.c.controls.d.controls.e.value).toBe(43);
-        expect(form.controls.c.controls.f.controls.g.value).toBe('test');
-        expect(form.controls.c.controls.h.value).toStrictEqual({ i: new Date('2022-07-08T13:21:05.951Z') });
+        expect(form6.controls.a.value).toBe(42);
+        expect(form6.controls.b?.controls![0].value).toBe('test');
+        expect(form6.controls.c.controls.d.controls.e.value![0]).toBe(43);
+        expect(form6.controls.c.controls.f.controls.g.value).toBe('test');
     })
 })

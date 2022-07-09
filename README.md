@@ -1,23 +1,7 @@
 # ngx-mf
 `ngx-mf` is zero dependency set of types for infer
 angular FormGroup type from model type.
-
-That means you can bind your models type with form type
-and check type errors.
-
-For example if you have codegen tools for models in your
-project you can just use that models to define forms type.
-
-If something changed in your models you see type checking
-errors - it is usefull in real world enterprise applications
-where everything can be changed.
-
-You can define your model interface once and then you
-can use it everywhere (in forms and backend interaction
-for example).
-
-Use only one source of truth is imported thing, and this
-lib can help you for that.
+That means you can bind your models type with form type.
 
 It's not increase of your bundle size because it's just
 TypeScript types.
@@ -38,20 +22,23 @@ $ yarn add ngx-mf --dev
 
 ## Usage
 
-`ngx-mf` export two types `FormControlsOf`
-and `FormControlsOfNonNullable`
+`ngx-mf` exports four types `FormModel`,
+`FormModelNonNullable`, `FM`, `FMN`
 
-`FormControlsOf<TObj, TAnnotation>` - It's helper type
-that infer special type from TObj (where TObj is your
-model type) that you can pass to FormGroup as a first
-type argument.
-You can define what you want (FormGroup ar FormArray)
-at the concreate field in TObj.
-It's possible because second argument TAnnotation do it.
+* `FormModel<TObj, TAnnotation>` - It's type that infer
+type from TObj (where TObj is your model type) that
+you can use at is.
+You can define what you want FormGroup ar FormArray
+at the concreate field in TObj by TAnnotation.
 You can pass TAnnotation as the second argument and specify
-output type, you shoul use special syntacis.
+output type, you should use special syntacis to do it.
 
-`FormControlsOfNonNullable<TObj, TAnnotation>` - do the same things but for `new FormBuilder().nonNullable`
+* `FormModelNonNullable<TObj, TAnnotation>` - do the same things
+but for `new FormBuilder().nonNullable`
+
+* `FM` - it's just symlink to type `FormModel`
+
+* `FMN` - it's just symlink to type `FormModelNonNullable`
 
 For example we have some model like this:
 
@@ -104,38 +91,258 @@ in [/tests/example.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/
 * `group` - should infer type FormGroup
 * `control` - should infer type FormControl
 
-Also annotations can have nested objects like `{a: 'group'}`.
+Also annotations can be nested like `{a: 'group'}`.
+and nested arrays like `{a: ['group']}`.
 
-Also annotations can have nested arrays like `{a: ['control']}`.
+And you can combine `{}`, `[]`, `'array'`, `'group'`, `'control'`
+to describe what you want
 
-### examples of usage
+If you use `{}` then object in the same level will be FormGroup
+
+If you use `[]` then object in the same level will be FormArray
+
+## Examples Of Usage
 
 ---
 
-Default behavior without annotations
+> Definition of example model:
+> 
+> ```typescript
+> interface Model {
+>     a: number;
+>     b: number[];
+>     c: {
+>         d: {
+>             e: number;
+>         }
+>         f: {
+>             g: string;
+>         }
+>         h: {
+>             i: Date;
+>         }
+>     }
+> }
+> ```
 
-```typescript
-interface SomeModel {
-    a: number;
-    b: number[];
-    c: {
-        d: number;
-    };
-}
+---
 
-type Form = FormGroup<FormControlsOf<SomeModel>>
-```
+Lets see what `FormModel` will do without annotations
 
-Form type would be
+> Define Form type:
+> 
+> ```typescript
+> type Form = FormModel<Model>
+> ```
 
-```typescript
-Form === FormGroup<{
-    a: FormControl<number | null>;
-    b: FormControl<number[] | null, true>;
-    c: FormControl<{
-        d: number;
-    }>;
-}>
-```
+> Inferred `Form` type:
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControlUtil<number, true>;
+>     b: FormControlUtil<string[], true>;
+>     c: FormControlUtil<PrepareObj<{
+>         d: {
+>             e: number[];
+>         };
+>         f: {
+>             g: string;
+>         };
+>     }>, true>;
+> }>
+> ```
 
-Every FormGroup member would be FormControl
+> Inferred angular `Form` type
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControl<number | null>;
+>     b: FormControl<string[] | null>;
+>     c: FormControl<{
+>         d: {
+>             e: number[];
+>         };
+>         f: {
+>             g: string;
+>         };
+>     } | null>;
+> }>
+
+As we see every `FormGroup` elements is `FormControls` 
+it is the default behavior of `FormModel`
+
+---
+
+Now we say that `b` should be `FormArray`
+
+> Define Form type:
+> 
+> ```typescript
+> type Form = FormModel<Model, { b: 'array' }>
+> ```
+
+> Inferred `Form` type:
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControlUtil<number, true>;
+>     b: FormArray<FormControl<string | null>>; // <<
+>     c: FormControlUtil<PrepareObj<{
+>         d: {
+>             e: number[];
+>         };
+>         f: {
+>             g: string;
+>         };
+>     }>, true>;
+> }>
+> ```
+
+> Inferred angular `FormGroup` type
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControl<number | null>;
+>     b: FormArray<FormControl<string | null>>; // <<
+>     c: FormControl<{
+>         d: {
+>             e: number[];
+>         };
+>         f: {
+>             g: string;
+>         };
+>     } | null>;
+> }>
+> ```
+
+---
+
+Now we say that `c` should be `FormGroup`
+
+> Define Form type:
+> 
+> ```typescript
+> type Form = FormModel<Model, { c: 'group' }>
+> ```
+ 
+> Inferred `Form` type:
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControlUtil<number, true>;
+>     b: FormControlUtil<string[], true>;
+>     c: FormGroup<{ // <<
+>         d: FormControlUtil<PrepareObj<{
+>             e: number[];
+>         }>, true>;
+>         f: FormControlUtil<PrepareObj<{
+>             g: string;
+>         }>, true>;
+>     }>;
+> }>
+> ```
+
+> Inferred angular `FormGroup` type
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControl<number | null>;
+>     b: FormControl<string[] | null>;
+>     c: FormGroup<{ // <<
+>         d: FormControl<{
+>             e: number[];
+>         } | null>;
+>         f: FormControl<{
+>             g: string;
+>         } | null>;
+>     }>;
+> }>
+> ```
+
+---
+
+Now we say that `c.f` should be `FormGroup`
+
+> Define Form type:
+> 
+> ```typescript
+> type Form = FormModel<Model, { c: { f: 'group' } }>
+> ```
+ 
+> Inferred `Form` type:
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControlUtil<number, true>;
+>     b: FormControlUtil<string[], true>;
+>     c: FormGroup<{ // <<
+>         d: FormControlUtil<PrepareObj<{
+>             e: number[];
+>         }>, true>;
+>         f: FormGroup<{ // <<
+>             g: FormControlUtil<string, true>;
+>         }>;
+>     }>;
+> }>
+> ```
+
+> Inferred angular `FormGroup` type
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControl<number | null>;
+>     b: FormControl<string[] | null>;
+>     c: FormGroup<{ // <<
+>         d: FormControl<{
+>             e: number[];
+>         } | null>;
+>         f: FormGroup<{ // <<
+>             g: FormControl<string | null>;
+>         }>;
+>     }>;
+> }>
+> ```
+
+---
+
+Now we say that `c.f` should be `FormGroup`
+
+> Define Form type:
+> 
+> ```typescript
+> type Form = FormModel<Model, { c: { d: { e: 'array' } } }>
+> ```
+
+> Inferred `Form` type:
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControlUtil<number, true>;
+>     b: FormControlUtil<string[], true>;
+>     c: FormGroup<{ // <<
+>         d: FormGroup<{ // <<
+>             e: FormArray<FormControl<number | null>>; // <<
+>         }>;
+>         f: FormControlUtil<PrepareObj<{
+>             g: string;
+>         }>, true>;
+>     }>;
+> }>
+> ```
+
+> Inferred angular `FormGroup` type
+> 
+> ```typescript
+> FormGroup<{
+>     a: FormControl<number | null>;
+>     b: FormControl<string[] | null>;
+>     c: FormGroup<{ // <<
+>         d: FormGroup<{ // <<
+>             e: FormArray<FormControl<number | null>>; // <<
+>         }>;
+>         f: FormControl<{
+>             g: string;
+>         } | null>;
+>     }>;
+> }>
+> ```

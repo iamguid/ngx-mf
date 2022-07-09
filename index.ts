@@ -1,5 +1,10 @@
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
+// Main type
+//
+// If TObj is array
+// then infer FormArray recursively
+// else infer FormGroup recursively
 export type FormModel<
   TObj extends Record<string, any> | Array<any>,
   TPreparedAnnotationsObj extends PrepareAnnotationsObj<TPreparedObj> | null = null,
@@ -8,6 +13,7 @@ export type FormModel<
   ? FormControlsOfInner<TPreparedObj, true, false, TPreparedAnnotationsObj>
   : FormGroup<FormControlsOfInner<TPreparedObj, true, true, TPreparedAnnotationsObj>>;
 
+// Types for debugging output
 type DEBUG = false;
 type DEBUG_1 = DEBUG extends true ? '1' : never;
 type DEBUG_2 = DEBUG extends true ? '2' : never;
@@ -19,8 +25,10 @@ type DEBUG_7 = DEBUG extends true ? '7' : never;
 type DEBUG_8 = DEBUG extends true ? '8' : never;
 type DEBUG_9 = DEBUG extends true ? '9' : never;
 
+// Form element types for annotations
 type FormElementType = 'control' | 'group' | 'array';
 
+// Convert T to annotations type recursively
 type PrepareAnnotationsObj<T> = {
   [key in keyof T]?:
     T[key] extends Array<infer U>
@@ -40,6 +48,7 @@ type PrepareAnnotationsObj<T> = {
       : FormElementType
 } | FormElementType;
 
+// Remove all nulls and undefined from T recursively
 type PrepareObj<T> = {
   [key in keyof T]-?: 
     NonNullable<T[key]> extends (infer U)[]
@@ -80,7 +89,9 @@ type FormControlsOfInner<
         [key in keyof TPreparedObj]-?: 
           // FormArray string annotation
           //
-          // If we have 'array' string in annotation and current object is record type then infer FormArray type
+          // If we have 'array' string in annotation
+          // and current object is record type
+          // then infer FormArray type recursively
           // @ts-ignore
           TPreparedAnnotationsObj[key] extends 'array'
             ? TPreparedObj[key] extends Array<infer U>
@@ -89,7 +100,10 @@ type FormControlsOfInner<
 
           // FormGroup string annotation
           //
-          // If we have 'group' string in annotation and current object is record type then infer FormGroup type
+          // If we have 'group' string in annotation
+          // and current object is record type
+          // then infer FormGroup type recursively
+          //
           // @ts-ignore
           : TPreparedAnnotationsObj[key] extends 'group'
             ? TPreparedObj[key] extends Record<string, any>
@@ -98,14 +112,19 @@ type FormControlsOfInner<
 
           // FormControl string annotation
           //
-          // If we have 'control' string in annotation then infer FormControl type
+          // If we have 'control' string in annotation
+          // then infer FormControl type
+          //
           // @ts-ignore
           : TPreparedAnnotationsObj[key] extends 'control'
             ? FormControlUtil<TPreparedObj[key], TNullable>
 
           // FormArray type annotation
           //
-          // If we have array type in annotation and current object is array type then infer FormArray type
+          // If we have array type in annotation
+          // and current object is array type
+          // then infer FormArray type recursively
+          //
           // @ts-ignore
           : TPreparedAnnotationsObj[key] extends Array<infer Z>
             ? TPreparedObj[key] extends Array<infer U>
@@ -114,7 +133,10 @@ type FormControlsOfInner<
 
           // FormGroup type annotation
           //
-          // If we have record type in annotation and current object is record type then infer FormGroup type
+          // If we have record type in annotation
+          // and current object is record type
+          // then infer FormGroup type recursively
+          //
           // @ts-ignore
           : TPreparedAnnotationsObj[key] extends Record<string, any>
             ? TPreparedObj[key] extends Record<string, any>
@@ -134,7 +156,9 @@ type FormControlsOfInner<
 
       // When annotations is not set
       //
-      // If we dont have annotations then every nested value in object is FormControl 
+      // If we dont have annotations then
+      //   if current object is Array infer FormArray recursively
+      //   else infer FormControl 
       TPreparedAnnotationsObj extends null
         ? TPreparedObj extends Array<infer U>
           ? FormArray<FormControlsOfInner<U, TNullable, false, null>>
@@ -142,7 +166,9 @@ type FormControlsOfInner<
 
       // FormArray string annotation
       //
-      // If we have 'array' string in annotation and current object is record type then infer FormArray type
+      // If we have 'array' string in annotation 
+      // and current object is array type 
+      // then infer FormArray type recursively
       : TPreparedAnnotationsObj extends 'array'
         ? TPreparedObj extends Array<any>
           ? FormArrayUtil<TPreparedObj, TNullable>
@@ -150,7 +176,9 @@ type FormControlsOfInner<
 
       // FormGroup string annotation
       //
-      // If we have 'group' string in annotation and current object is record type then infer FormGroup type
+      // If we have 'group' string in annotation
+      // and current object is record type
+      // then infer FormGroup type recursively
       : TPreparedAnnotationsObj extends 'group'
         ? TPreparedObj extends Record<string, any>
           ? FormGroup<FormControlsOfInner<TPreparedObj, TNullable, true, null>>
@@ -158,13 +186,16 @@ type FormControlsOfInner<
 
       // FormControl string annotation
       //
-      // If we have 'control' string in annotation then infer FormControl type
+      // If we have 'control' string in annotation
+      // then infer FormControl type
       : TPreparedAnnotationsObj extends 'control'
         ? FormControlUtil<TPreparedObj, TNullable>
       
       // FormArray type annotation
       //
-      // If we have array type in annotation and current object is array type then infer FormArray type
+      // If we have array type in annotation
+      // and current object is array type
+      // then infer FormArray type recursively
       : TPreparedAnnotationsObj extends Array<infer Z>
         ? TPreparedObj extends Array<infer U>
           ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
@@ -172,7 +203,9 @@ type FormControlsOfInner<
 
       // FormGroup type annotation
       //
-      // If we have record type in annotation and current object is record type then infer FormGroup type
+      // If we have record type in annotation
+      // and current object is record type
+      // then infer FormGroup type recursively
       : TPreparedAnnotationsObj extends Record<string, any>
         ? TPreparedObj extends Record<string, any>
           ? FormGroup<FormControlsOfInner<TPreparedObj, TNullable, true, TPreparedAnnotationsObj>>
@@ -180,5 +213,5 @@ type FormControlsOfInner<
 
       // FormControl as default
       //
-      // Otherwise infer FormControl type base on current object type
+      // Otherwise infer FormControl type based on current object type
       : FormControlUtil<TPreparedObj, TNullable>;
