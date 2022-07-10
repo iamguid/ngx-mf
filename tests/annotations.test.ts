@@ -40,6 +40,17 @@ describe('Test FormControlsOf annotations', () => {
         expect(form.controls[0].value).toBe(42);
     })
 
+    it('array string annotation', () => {
+        type Model = number[];
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model, 'array'> = fb.array([42])
+
+        expect(form.value[0]).toBe(42);
+        expect(form.controls[0].value).toBe(42);
+    })
+
     it('group', () => {
         interface Model {
             a: number;
@@ -51,6 +62,31 @@ describe('Test FormControlsOf annotations', () => {
 
         expect(form.value.a).toBe(42);
         expect(form.controls.a.value).toBe(42);
+    })
+
+    it('group string annotation', () => {
+        interface Model {
+            a: number;
+        };
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model> = fb.group({ a: [42] })
+
+        expect(form.value.a).toBe(42);
+        expect(form.controls.a.value).toBe(42);
+    })
+
+    it('control string annotation', () => {
+        interface Model {
+            a: number;
+        };
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model, 'control'> = fb.control({ a: 42 })
+
+        expect(form.value?.a).toBe(42);
     })
 
     it('array inside group', () => {
@@ -97,7 +133,7 @@ describe('Test FormControlsOf annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: 'group' }> = fb.group({
+        const form: FormModel<Model, { a: { b: 'control' } }> = fb.group({
             a: fb.group({ 
                 b: [42]
             }),

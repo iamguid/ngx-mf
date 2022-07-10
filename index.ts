@@ -9,10 +9,13 @@ export type FormModel<
   TModel extends Record<string, any> | Array<any>,
   TPreparedAnnotations extends PrepareAnnotations<TPreparedModel> | null = null,
   TPreparedModel extends PrepareModel<TModel> = PrepareModel<TModel>
-> = TModel extends Array<any>
+> =
+  TModel extends Array<any>
+  ? FormControlsOfInner<TPreparedModel, true, false, TPreparedAnnotations>
+  : TPreparedAnnotations extends string
   ? FormControlsOfInner<TPreparedModel, true, false, TPreparedAnnotations>
   // @ts-ignore
-  : FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>;
+  : FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>
 
 // Types for debugging output
 type DEBUG = false;
@@ -47,7 +50,7 @@ type PrepareAnnotations<T> = {
           | [FormElementType]
         )
       : FormElementType
-};
+} | FormElementType;
 
 // Remove all nulls and undefined from T recursively
 type PrepareModel<T> = {
