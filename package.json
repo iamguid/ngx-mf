@@ -1,6 +1,6 @@
 {
   "name": "ngx-mf",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Bind your model types to angular FormGroup type",
   "main": "index.ts",
   "repository": {
@@ -11,7 +11,14 @@
     "url": "https://github.com/iamguid/ngx-mf/issues"
   },
   "homepage": "https://github.com/iamguid/ngx-mf",
-  "keywords": ["angular", "forms", "typed-forms", "interface", "model", "binding"],
+  "keywords": [
+    "angular",
+    "forms",
+    "typed-forms",
+    "interface",
+    "model",
+    "binding"
+  ],
   "author": "Vladislav <iam.guid@gmail.com>",
   "license": "MIT",
   "private": false,
