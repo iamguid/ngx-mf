@@ -21,17 +21,12 @@ export type FormModel<
   : TPreparedAnnotations extends Array<any>
     ? TModel extends Array<any>
       ? FormControlsOfInner<TPreparedModel, true, false, TPreparedAnnotations>
-    : TModel extends object
-      // @ts-ignore
-      ? FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>
-    : ERROR_1
+      : ERROR_4
   : TPreparedAnnotations extends object
-    ? TModel extends Array<any>
-      ? FormControlsOfInner<TPreparedModel, true, false, TPreparedAnnotations>
-    : TModel extends object
+    ? TModel extends object
       // @ts-ignore
       ? FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>
-    : ERROR_1
+    : ERROR_5
   : ERROR_2;
 
 // Special type for annotation
