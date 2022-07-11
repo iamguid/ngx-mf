@@ -17,8 +17,12 @@ export type FormModel<
   // @ts-ignore
   : FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>
 
+// Special types for annotation
+export type Annotate<T> = T & { __annotate__: '__annotate__' };
+export type Replace<T> = T & { __replace__: '__replace__' };
+
 // Types for debugging output
-type DEBUG = true;
+type DEBUG = false;
 type DEBUG_1 = DEBUG extends true ? '1' : unknown;
 type DEBUG_2 = DEBUG extends true ? '2' : unknown;
 type DEBUG_3 = DEBUG extends true ? '3' : unknown;
@@ -28,6 +32,7 @@ type DEBUG_6 = DEBUG extends true ? '6' : unknown;
 type DEBUG_7 = DEBUG extends true ? '7' : unknown;
 type DEBUG_8 = DEBUG extends true ? '8' : unknown;
 type DEBUG_9 = DEBUG extends true ? '9' : unknown;
+type DEBUG_10 = DEBUG extends true ? '9' : unknown;
 
 // Form element types for annotations
 type FormElementType = 'control' | 'group' | 'array';
@@ -41,6 +46,7 @@ type PrepareAnnotations<T> = {
         | FormElementType
         | [PrepareAnnotations<U>]
         | [FormElementType]
+        | Annotate<any>
       )
       : T[key] extends Record<string, any>
         ? (
@@ -48,9 +54,10 @@ type PrepareAnnotations<T> = {
           | FormElementType
           | [PrepareAnnotations<T[key]>]
           | [FormElementType]
+          | Annotate<any>
         )
-      : FormElementType
-} | FormElementType;
+      : FormElementType | Annotate<any>
+} | FormElementType | Annotate<any>;
 
 // Remove all nulls and undefined from T recursively
 type PrepareModel<T> = {
@@ -91,6 +98,26 @@ type FormControlsOfInner<
       ? { [key in keyof TPreparedModel]-?: FormControlUtil<TPreparedModel[key], TNullable>; }
       : {
         [key in keyof TPreparedModel]-?: 
+          // type annotation
+          //
+          // If we have Annotate<T> in annotation
+          // then infer FormControl type based on annotation type
+          //
+          // @ts-ignore
+          TPreparedAnnotations[key] extends Annotate<infer TInferredAnnotation>
+              // @ts-ignore
+              ? FormModel<TInferredAnnotation, null>
+
+          // replace annotation
+          //
+          // If we have Replace<any> in annotation
+          // then infer FormControl type based on annotation type
+          //
+          // @ts-ignore
+          : TPreparedAnnotations[key] extends Replace<infer TInferredAnnotation>
+              // @ts-ignore
+              ? TInferredAnnotation
+
           // FormArray string annotation
           //
           // If we have 'array' string in annotation
@@ -98,8 +125,8 @@ type FormControlsOfInner<
           // then infer FormArray type recursively
           //
           // @ts-ignore
-          TPreparedAnnotations[key] extends 'array'
-            ? TPreparedModel[key] extends Array<infer U>
+          : TPreparedAnnotations[key] extends 'array'
+            ? TPreparedModel[key] extends Array<any>
               ? FormArrayUtil<TPreparedModel[key], TNullable>
               : DEBUG_4
 
@@ -131,10 +158,10 @@ type FormControlsOfInner<
           // then infer FormArray type recursively
           //
           // @ts-ignore
-          : TPreparedAnnotations[key] extends Array<infer Z>
-            ? TPreparedModel[key] extends Array<infer U>
+          : TPreparedAnnotations[key] extends Array<infer TInferredAnnotation>
+            ? TPreparedModel[key] extends Array<infer TInferredModel>
               // @ts-ignore
-              ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
+              ? FormArray<FormControlsOfInner<TInferredModel, TNullable, false, TInferredAnnotation>>
               : DEBUG_2
 
           // FormGroup type annotation
@@ -153,6 +180,8 @@ type FormControlsOfInner<
           // FormControl as default
           //
           // Otherwise infer FormControl type based on current object type
+          //
+          // @ts-ignore
           : FormControlUtil<TPreparedModel[key], TNullable>;
     }
 
@@ -167,8 +196,8 @@ type FormControlsOfInner<
       //   if current object is Array infer FormArray recursively
       //   else infer FormControl 
       TPreparedAnnotations extends null
-        ? TPreparedModel extends Array<infer U>
-          ? FormArray<FormControlsOfInner<U, TNullable, false, null>>
+        ? TPreparedModel extends Array<infer TInferredModel>
+          ? FormArray<FormControlsOfInner<TInferredModel, TNullable, false, null>>
           : FormControlUtil<TPreparedModel, TNullable>
 
       // FormArray string annotation
@@ -203,10 +232,10 @@ type FormControlsOfInner<
       // If we have array type in annotation
       // and current object is array type
       // then infer FormArray type recursively
-      : TPreparedAnnotations extends Array<infer Z>
-        ? TPreparedModel extends Array<infer U>
+      : TPreparedAnnotations extends Array<infer TInferredAnnotation>
+        ? TPreparedModel extends Array<infer TInferredModel>
           // @ts-ignore
-          ? FormArray<FormControlsOfInner<U, TNullable, false, Z>>
+          ? FormArray<FormControlsOfInner<TInferredModel, TNullable, false, TInferredAnnotation>>
           : DEBUG_6
 
       // FormGroup type annotation

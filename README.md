@@ -92,11 +92,12 @@ here [/tests/example.test.ts](https://github.com/iamguid/ngx-mf/blob/master/test
 
 ## Annotations
 `ngx-mf` annotations have three different keywords: `array`,
-`group` and `control`
+`group`, `control` and special type `Replace`
 
 * `array` - infer `FormArray`
 * `group` - infer `FormGroup`
 * `control` - infer `FormControl`
+* `Replace<T>` - if you want replace inferred type to `T`
 
 Also annotations can be objects like `{a: 'group'}`,
 and arrays like `['group']`.
@@ -106,6 +107,26 @@ to specify what you want.
 
 If you use `{}` then object with the same nesting will be `FormGroup`
 If you use `[]` then object with the same nesting will be `FormArray`
+
+When you want to full replace inferred type you 
+can use `Replace<T>`
+
+For example: we have `FormGroup`, but want `FormControl`:
+
+```typescript
+interface Model {
+    a: {
+        b: number;
+    }
+}
+
+type Form = FormModel<Model, { a: Replace<FormControl<number | null>> }>;
+
+// Form inferred:
+FormGroup<{
+    a: FormControl<number | null>;
+}>
+```
 
 ## Examples Of Usage
 
@@ -281,7 +302,8 @@ Now let's say that `c.d.e` should be `FormArray`
 > FormArray<FormControl<number>>
 > ```
 
-> Also you can define FormArray recursively like group inside array inside array :)
+> Also you can define FormArray recursively like group inside
+> array inside array :)
 > ```typescript
 > type Form = FormModel<SomeModel, [['group']]>
 > ```
@@ -321,9 +343,9 @@ Other examples you can find in annotation tests [/tests/annotation.test.ts](http
 > i think it is inderect errors, but when you bind
 > forms to models you see errors on the form definition
 
-> Q: What about dynamically forms ?
+> Q: What about dynamic forms ?
 > 
-> A: It's just lib and you can use it or not, but i think
-> in most cases forms will be based on some interfaces
-> or models and nevertheless you can try to define
-> your forms based on your interfaces
+> A: In some cases use `Replace` special type
+> to define what you want to infer (see Annotations chapter)
+> You can `Replace` inferred type to something like `FormGroup<any>`
+> and then cast it to your types

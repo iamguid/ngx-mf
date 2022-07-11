@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
-import { FormBuilder } from "@angular/forms";
-import { FormModel } from "..";
+import { FormBuilder, FormControl } from "@angular/forms";
+import { FormModel, Replace } from "..";
 
 describe('Test FormControlsOf annotations', () => {
     it('all primitives without annotations', () => {
@@ -339,5 +339,60 @@ describe('Test FormControlsOf annotations', () => {
 
         expect(form.value.a?.b![0].c?.d).toBe(42);
         expect(form.controls.a?.controls.b.controls[0].controls.c.controls.d.value).toBe(42);
+    })
+
+    it('Replace: change output type to another FormModel', () => {
+        interface Model1 {
+            a: {
+                b: number;
+            }
+        }
+
+        interface Model2 {
+            c: string;
+        }
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model1, { a: Replace<FormModel<Model2>> }> = fb.group({
+            a: fb.group({
+                c: ['test']
+            })
+        })
+
+        expect(form.value.a?.c).toBe('test');
+        expect(form.controls.a.controls.c.value).toStrictEqual('test');
+    })
+
+    it('Replace: change output type to FormControl<Date>', () => {
+        interface Model {
+            a: string;
+        }
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model, { a: Replace<FormControl<Date | null>> }> = fb.group({
+            a: [new Date('2022-07-11T18:27:19.583Z')],
+        })
+
+        expect(form.value.a).toStrictEqual(new Date('2022-07-11T18:27:19.583Z'));
+        expect(form.controls.a.value).toStrictEqual(new Date('2022-07-11T18:27:19.583Z'));
+    })
+
+    it('Replace: change output type to FormControl<number>', () => {
+        interface Model {
+            a: {
+                b: number;
+            };
+        }
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model, { a: Replace<FormControl<number | null>> }> = fb.group({
+            a: fb.control(42),
+        })
+
+        expect(form.value.a).toBe(42);
+        expect(form.controls.a.value).toBe(42);
     })
 });
