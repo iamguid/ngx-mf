@@ -257,4 +257,23 @@ describe('Misc tests', () => {
         expect(form.value.a?.b?.c).toBe(42);
         expect(form.value.d?.e?.f).toBe(42);
     })
+
+    it('additional field', () => {
+        interface Model {
+            a: number;
+        } 
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model & { b: string }> = fb.group({
+            a: [42],
+            b: ['test'],
+        })
+
+        expect(form.value.a).toBe(42);
+        expect(form.value.b).toBe('test');
+
+        expect(form.controls.a.value).toBe(42);
+        expect(form.controls.b.value).toBe('test');
+    })
 })

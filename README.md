@@ -60,6 +60,15 @@ should omit or pick them from source model.
 Omit<IUserModel, 'id'>
 ```
 
+If we want to add some field then we should using `&`
+operator, for examle:
+
+```typescript
+IUserModel & {
+    someField: number;
+}
+```
+
 Then we want to specify `contacts` as `FormArray` and specify
 every contact as `FormGroup`, so we need to pass annotation
 in our `FormModel` type. The syntax of annotation would
