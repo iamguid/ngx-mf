@@ -36,6 +36,6 @@
   "scripts": {
     "build": "yarn tsc --build --verbose",
     "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir ./ ./tests/*.test.ts",
-    "publish": "yarn test && npm publish"
+    "pub": "yarn test && npm publish"
   }
 }

@@ -311,7 +311,7 @@ Now let's say that `c.d.e` should be `FormArray`
 > type Form = FormModel<SomeModel, [{a: 'array'}]>
 > ```
 
-Other examples you can find in annotation tests [/tests/annotation.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotation.test.ts)
+Other examples you can find in annotation tests [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
 
 ## Questions
 
