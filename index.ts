@@ -18,7 +18,7 @@ export type FormModel<
   : FormGroup<FormControlsOfInner<TPreparedModel, true, true, TPreparedAnnotations>>
 
 // Types for debugging output
-type DEBUG = false;
+type DEBUG = true;
 type DEBUG_1 = DEBUG extends true ? '1' : unknown;
 type DEBUG_2 = DEBUG extends true ? '2' : unknown;
 type DEBUG_3 = DEBUG extends true ? '3' : unknown;
