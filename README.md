@@ -5,9 +5,6 @@ angular `FormGroup` type from model type.
 It doesn't increase your bundle size because it's just
 TypeScript types.
 
-WARNING: it is works only when typescript compiler
-option `strictNullChecks` is true
-
 ## Installation
 
 npm
