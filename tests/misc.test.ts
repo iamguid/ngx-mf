@@ -143,7 +143,7 @@ describe('Misc tests', () => {
         expect(form3.value.b![0]).toBe('test');
         expect(form3.value.c?.d?.e![0]).toBe(43);
         expect(form3.value.c?.f?.g).toBe('test');
-3
+
         expect(form3.controls.a.value).toBe(42);
         expect(form3.controls.b?.value![0]).toBe('test');
         expect(form3.controls.c.controls.d.value).toStrictEqual({ e: [43], });
@@ -166,7 +166,7 @@ describe('Misc tests', () => {
         expect(form4.value.b![0]).toBe('test');
         expect(form4.value.c?.d?.e![0]).toBe(43);
         expect(form4.value.c?.f?.g).toBe('test');
-34
+
         expect(form4.controls.a.value).toBe(42);
         expect(form4.controls.b?.value![0]).toBe('test');
         expect(form4.controls.c.controls.d.value).toStrictEqual({ e: [43] });
@@ -189,7 +189,7 @@ describe('Misc tests', () => {
         expect(form5.value.b![0]).toBe('test');
         expect(form5.value.c?.d?.e![0]).toBe(43);
         expect(form5.value.c?.f?.g).toBe('test');
-345
+
         expect(form5.controls.a.value).toBe(42);
         expect(form5.controls.b?.value![0]).toBe('test');
         expect(form5.controls.c.controls.d.controls.e.controls[0].value).toStrictEqual(43);
