@@ -107,7 +107,7 @@ type PrepareModel<T> = {
 
 type FormArrayUtil<T, TNullable extends boolean> =
   T extends Array<infer U>
-    ? FormArray<FormControl<TNullable extends true ? (U | null) : U>>
+    ? FormArray<FormControlUtil<U, TNullable>>
     : ERROR_3;
 
 type FormControlUtil<T, TNullable extends boolean> = FormControl<
