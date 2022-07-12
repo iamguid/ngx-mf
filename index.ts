@@ -29,6 +29,35 @@ export type FormModel<
     : ERROR_5
   : ERROR_2;
 
+// Main type NonNullable
+export type FormModelNN<
+  TModel extends object | Array<any>,
+  TPreparedAnnotations extends PrepareAnnotations<TPreparedModel> | null = null,
+  TPreparedModel extends PrepareModel<TModel> = PrepareModel<TModel>
+> =
+  TPreparedAnnotations extends null
+    ? TModel extends Array<any>
+      ? FormControlsOfInner<TPreparedModel, false, false, null>
+    : TModel extends object
+      ? FormGroup<FormControlsOfInner<TPreparedModel, false, true, null>>
+    : ERROR_1
+  : TPreparedAnnotations extends string
+    ? TModel extends Array<any>
+      ? FormControlsOfInner<TPreparedModel, false, false, TPreparedAnnotations>
+    : TModel extends object
+      ? FormControlsOfInner<TPreparedModel, false, false, TPreparedAnnotations>
+    : ERROR_1
+  : TPreparedAnnotations extends Array<any>
+    ? TModel extends Array<any>
+      ? FormControlsOfInner<TPreparedModel, false, false, TPreparedAnnotations>
+      : ERROR_4
+  : TPreparedAnnotations extends object
+    ? TModel extends object
+      // @ts-ignore
+      ? FormGroup<FormControlsOfInner<TPreparedModel, false, true, TPreparedAnnotations>>
+    : ERROR_5
+  : ERROR_2;
+
 // Special type for annotation
 export type Replace<T> = T & { __replace__: '__replace__' };
 

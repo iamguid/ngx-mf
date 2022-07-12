@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel } from "..";
+import { FormModel, FormModelNN } from "..";
 
 describe('Misc tests', () => {
     it('objects inside FormControl', () => {
@@ -275,5 +275,20 @@ describe('Misc tests', () => {
 
         expect(form.controls.a.value).toBe(42);
         expect(form.controls.b.value).toBe('test');
+    })
+
+    it('NonNullable type', () => {
+        interface Model {
+            a: number;
+        }
+
+        const fb = new FormBuilder().nonNullable;
+
+        const form: FormModelNN<Model> = fb.group({
+            a: [42]
+        })
+
+        expect(form.value.a).toBe(42);
+        expect(form.controls.a.value).toBe(42);
     })
 })
