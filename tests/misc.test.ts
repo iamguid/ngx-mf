@@ -4,6 +4,40 @@ import { FormBuilder, FormGroup } from "@angular/forms";
 import { FormModel, FormModelNN } from "..";
 
 describe('Misc tests', () => {
+    it('undefined nullable optional field', () => {
+        interface Model {
+            a?: number | null | undefined
+        }
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model> = fb.group({
+            a: [42]
+        })
+
+        expect(form.value.a).toBe(42);
+        expect(form.controls.a.value).toBe(42);
+    })
+
+    it('nested undefined nullable optional fields', () => {
+        interface Model {
+            a?: {
+                b?: number | null | undefined;
+            } | null | undefined;
+        }
+
+        const fb = new FormBuilder();
+
+        const form: FormModel<Model, { a: 'group' }> = fb.group({
+            a: fb.group({
+                b: [42]
+            })
+        })
+
+        expect(form.value.a?.b).toBe(42);
+        expect(form.controls.a.controls.b.value).toBe(42);
+    })
+
     it('objects inside FormControl', () => {
         interface Model {
             a: Date;
