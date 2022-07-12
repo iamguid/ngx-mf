@@ -3,7 +3,7 @@ import "@angular/compiler";
 import { FormBuilder, FormControl } from "@angular/forms";
 import { FormModel, Replace } from "..";
 
-describe('Test FormControlsOf annotations', () => {
+describe('Test FormModel annotations', () => {
     it('all primitives without annotations', () => {
         interface Model {
             a: number;
@@ -18,7 +18,7 @@ describe('Test FormControlsOf annotations', () => {
         const form: FormModel<Model> = fb.group({
             a: [42],
             b: [[1, 2, 3]],
-            c: [{ d: 42 }],
+            c: [<Model['c']>{ d: 42 }],
         })
 
         expect(form.value.a).toBe(42);

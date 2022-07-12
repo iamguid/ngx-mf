@@ -20,7 +20,7 @@ describe('User form example', () => {
             firstName: string;
             lastName: string;
             nickname: string;
-            birthday: Date;
+            birthday: number;
             contacts: IContactModel[];
         }
 
@@ -30,7 +30,7 @@ describe('User form example', () => {
             firstName: new FormControl<string | null>(null),
             lastName: new FormControl<string | null>(null),
             nickname: new FormControl<string | null>(null),
-            birthday: new FormControl<Date | null>(null),
+            birthday: new FormControl<number | null>(null),
             contacts: new FormArray<FormModel<IContactModel>>([]),
         });
 
@@ -38,7 +38,7 @@ describe('User form example', () => {
             firstName: 'Vladislav',
             lastName: 'Lebedev',
             nickname: 'iam.guid',
-            birthday: new Date('022-07-07T17:10:03.102Z'),
+            birthday: +new Date('022-07-07T17:10:03.102Z'),
             contacts: [{
                 type: ContactType.Email,
                 contact: 'iam.guid@gmail.com'
