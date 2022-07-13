@@ -20,7 +20,7 @@ describe('User form example', () => {
             firstName: string;
             lastName: string;
             nickname: string;
-            birthday: Date;
+            birthday: number;
             contacts: IContactModel[];
         }
 
@@ -33,7 +33,7 @@ describe('User form example', () => {
             firstName: [<string | null>null],
             lastName: [<string | null>null],
             nickname: [<string | null>null],
-            birthday: [<Date | null>null],
+            birthday: [<number | null>null],
             contacts: fb.array<ContactForm>([]),
         });
 
@@ -41,7 +41,7 @@ describe('User form example', () => {
             firstName: 'Vladislav',
             lastName: 'Lebedev',
             nickname: 'iam.guid',
-            birthday: new Date('022-07-07T17:10:03.102Z'),
+            birthday: +new Date('022-07-07T17:10:03.102Z'),
             contacts: [{
                 type: ContactType.Email,
                 contact: 'iam.guid@gmail.com'

@@ -125,6 +125,25 @@ FormGroup<{
 }>
 ```
 
+## Infer Modes
+`ngx-mf` have four different InferMode-s: `InferModeNullable`,
+`InferModeNonNullable`, `InferModeFromModel`, and special mode
+`InferModeSaveOptional` with those modes you can manage what you want
+to infer in FormControl.
+
+* `InferModeNullable` - infer `FormControl<NonNullable<T> | null>`
+(by default)
+* `InferModeNonNullable` - infer `FormControl<NonNullable<T>`
+* `InferModeFromModel` - infer `FormControl<Exclude<T, undefined>>`
+* `InferModeSaveOptional` - save optional(`field:?`) or not
+
+If `InferModeSaveOptional` is not provided then each model field
+will be required, otherwise each field will be optional if source field
+is optional.
+
+You can combine `InferModeSaveOptional` with other modes with type union,
+for example `InferModeNullable & InferModeSaveOptional` means that each field should saves optional but every field will be nullable.
+
 ## Examples Of Usage
 
 > Definition of example model:
