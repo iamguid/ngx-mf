@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
-import { FormBuilder } from "@angular/forms";
-import { FormModel, InferModeNonNullable, InferModeNullable } from "..";
+import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormModel, InferModeNonNullable, InferModeNullable, InferModeSaveOptional } from "..";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field', () => {
@@ -315,5 +315,42 @@ describe('Misc tests', () => {
 
         expect(form.controls.a.value).toBe(42);
         expect(form.controls.b.value).toBe('test');
+    })
+
+    it('forms union', () => {
+        interface ModelA {
+            a?: number;
+        }
+
+        interface ModelB {
+            b?: number;
+        }
+
+        type Form1 = FormModel<ModelA, null, InferModeNonNullable>;
+        type Form2 = FormModel<ModelB, null, InferModeNullable & InferModeSaveOptional>;
+        type UnionFormGroupControls = Form1['controls'] & Form2['controls'];
+
+        const fb = new FormBuilder();
+
+        // Without field b
+        const form1: FormGroup<UnionFormGroupControls> = fb.group<UnionFormGroupControls>({
+            a: fb.control(42, { nonNullable: true })
+        })
+
+        expect(form1.value.a).toBe(42);
+        expect(form1.value.b).toBeUndefined();
+        expect(form1.controls.a.value).toBe(42);
+        expect(form1.controls.b?.value).toBeUndefined();
+
+        // With field b
+        const form2: FormGroup<UnionFormGroupControls> = fb.group<UnionFormGroupControls>({
+            a: fb.control(42, { nonNullable: true }),
+            b: fb.control(42)
+        })
+
+        expect(form2.value.a).toBe(42);
+        expect(form2.value.b).toBe(42);
+        expect(form2.controls.a.value).toBe(42);
+        expect(form2.controls.b?.value).toBe(42);
     })
 })
