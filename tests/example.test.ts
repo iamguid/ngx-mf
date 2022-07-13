@@ -1,6 +1,6 @@
 import "@angular/compiler";
 
-import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms"
+import { FormBuilder, Validators } from "@angular/forms"
 import { FormModel } from ".."
 
 describe('User form example', () => {
@@ -24,14 +24,17 @@ describe('User form example', () => {
             contacts: IContactModel[];
         }
 
-        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }>
+        const fb = new FormBuilder();
 
-        const form: UserForm = new FormGroup({
-            firstName: new FormControl<string | null>(null),
-            lastName: new FormControl<string | null>(null),
-            nickname: new FormControl<string | null>(null),
-            birthday: new FormControl<Date | null>(null),
-            contacts: new FormArray<FormModel<IContactModel>>([]),
+        type ContactForm = FormModel<IContactModel>;
+        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }>;
+
+        const form: UserForm = fb.group({
+            firstName: [<string | null>null],
+            lastName: [<string | null>null],
+            nickname: [<string | null>null],
+            birthday: [<Date | null>null],
+            contacts: fb.array<ContactForm>([]),
         });
 
         const value: Omit<IUserModel, 'id'> = {
@@ -45,9 +48,9 @@ describe('User form example', () => {
             }],
         }
 
-        form.controls.contacts.controls.push(new FormGroup({
-            type: new FormControl<ContactType | null>(ContactType.Email),
-            contact: new FormControl<string | null>(null, Validators.email),
+        form.controls.contacts.controls.push(fb.group({
+            type: [<ContactType | null>ContactType.Email],
+            contact: [<string | null>null, Validators.email],
         }));
 
         form.patchValue(value);
