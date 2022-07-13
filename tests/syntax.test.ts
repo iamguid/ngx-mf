@@ -170,15 +170,17 @@ describe('Test different form definition syntax', () => {
             expect(form.controls.a.value).toBe(42);
         })
 
-        // it('array syntax', () => {
-        //     const fb = new FormBuilder();
+        it.skip('array syntax', () => {
+            const fb = new FormBuilder();
 
-        //     const form: FormModel<SimpleModel> = fb.group({
-        //         a: [{ value: 42, disabled: false }]
-        //     })
+            // Doesn't work :(
+            // @ts-ignore
+            const form: FormModel<SimpleModel> = fb.group({
+                a: [{ value: 42, disabled: false }]
+            })
 
-        //     expect(form.value.a).toBe(42);
-        //     expect(form.controls.a.value).toBe(42);
-        // })
+            expect(form.value.a).toBe(42);
+            expect(form.controls.a.value).toBe(42);
+        })
     })
 })
