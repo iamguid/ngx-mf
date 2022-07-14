@@ -135,14 +135,15 @@ to infer in FormControl.
 (by default)
 * `InferModeNonNullable` - infer `FormControl<NonNullable<T>`
 * `InferModeFromModel` - infer `FormControl<Exclude<T, undefined>>`
-* `InferModeSaveOptional` - save optional(`field:?`) or not
+* `InferModeSaveOptional` - save optionals fields (`field?:`) or not
 
 If `InferModeSaveOptional` is not provided then each model field
 will be required, otherwise each field will be optional if source field
 is optional.
 
 You can combine `InferModeSaveOptional` with other modes with type union,
-for example `InferModeNullable & InferModeSaveOptional` means that each field should saves optional but every field will be nullable.
+for example `InferModeNullable & InferModeSaveOptional` means that each
+field should saves optional but every field will be nullable.
 
 ## Examples Of Usage
 
@@ -330,7 +331,8 @@ Now let's say that `c.d.e` should be `FormArray`
 > type Form = FormModel<SomeModel, [{a: 'array'}]>
 > ```
 
-Other examples you can find in annotation tests [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
+Other examples you can find in annotation tests
+[/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
 
 ## Questions
 
@@ -361,7 +363,7 @@ Other examples you can find in annotation tests [/tests/annotations.test.ts](htt
 
 > Q: What about dynamic forms ?
 > 
-> A: In some cases use `Replace` special type
+> A: In dynamic cases use `Replace` special type
 > to define what you want to infer (see Annotations chapter)
 > You can `Replace` inferred type to something like `FormGroup<any>`
 > and then cast it to your types
