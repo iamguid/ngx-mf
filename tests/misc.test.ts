@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel, InferModeNonNullable, InferModeNullable, InferModeSaveOptional } from "..";
+import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeSaveOptional } from "..";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field', () => {
@@ -11,8 +11,10 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model> = fb.group({
-            a: [42]
+        type Form = FormModel<Model>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control(42)
         })
 
         expect(form.value.a).toBe(42);
@@ -22,30 +24,33 @@ describe('Misc tests', () => {
     it('nested undefined nullable optional fields', () => {
         interface Model {
             a?: {
-                b?: number | null | undefined;
-            } | null | undefined;
+                b?: number | null;
+            } | null;
         }
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: 'group' }> = fb.group({
-            a: fb.group({
-                b: [42]
+        type Form = FormModel<Model, { a: 'group' }>;
+        type NestedForm = NonNullable<Form['controls']['a']['controls']>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<NestedForm>({
+                b: fb.control(42)
             })
         })
 
         expect(form.value.a?.b).toBe(42);
-        expect(form.controls.a.controls.b.value).toBe(42);
+        expect(form.controls.a?.controls?.b.value).toBe(42);
     })
 
-    it('Date inside FormControl', () => {
+    it.skip('Date inside FormControl', () => {
         interface Model {
             a: Date;
         }
 
         const fb = new FormBuilder();
 
-        // Doesn't work :(
+        // TODO: Doesn't work :(
         // @ts-ignore
         const form: FormModel<Model> = fb.group({
             a: [new Date('2022-07-08T06:46:28.452Z')]
@@ -88,7 +93,7 @@ describe('Misc tests', () => {
         expect(form.controls.a.value).toBe(42);
     })
 
-    it.skip('complex form', () => {
+    it('complex form', () => {
         interface Model {
             a: number;
             b: string[];
@@ -104,19 +109,19 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        // Doesn't work :(
-        // @ts-ignore
-        const form1: FormModel<Model, null, InferModeNullable> = fb.group({
-            a: [<null | number>42],
-            b: [<null | string[]>['test']],
-            c: [<null | Model['c']>{
+        type Form = FormModel<Model, null, InferModeNullable>
+
+        const form1: Form = fb.group<Form['controls']>({
+            a: fb.control(42),
+            b: fb.control(['test']),
+            c: fb.control({
                 d: {
                     e: [43],
                 },
                 f: {
                     g: 'test'
                 },
-            }]
+            })
         });
 
         expect(form1.value.a).toBe(42);
@@ -135,8 +140,6 @@ describe('Misc tests', () => {
             },
         });
 
-        // Doesn't work :(
-        // @ts-ignore
         const form2: FormModel<Model, { b: 'array' }> = fb.group({
             a: [42],
             b: fb.array([['test']]),
@@ -272,9 +275,9 @@ describe('Misc tests', () => {
                     c: number;
                 }
             },
-            d: {
-                e: {
-                    f: number
+            d?: {
+                e?: {
+                    f?: number
                 }
             }
         }

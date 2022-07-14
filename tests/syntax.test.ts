@@ -173,7 +173,7 @@ describe('Test different form definition syntax', () => {
         it.skip('array syntax', () => {
             const fb = new FormBuilder();
 
-            // Doesn't work :(
+            // TODO: Doesn't work :(
             // @ts-ignore
             const form: FormModel<SimpleModel> = fb.group({
                 a: [{ value: 42, disabled: false }]

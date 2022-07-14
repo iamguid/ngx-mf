@@ -3,16 +3,16 @@ import "@angular/compiler";
 import { FormBuilder } from "@angular/forms"
 import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeSaveOptional } from "..";
 
-describe('Test InferModes', () => {
-    it('default behavior', () => {
+describe('InferModeNonNullable', () => {
+    it('nullable flat object', () => {
         interface Model {
-            a?: number | null,
-            b: number | null
+            a?: number | null | undefined,
+            b: number | null,
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model>
+        type Form = FormModel<Model, null, InferModeNonNullable>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42),
@@ -25,36 +25,65 @@ describe('Test InferModes', () => {
         expect(form.controls.b.value).toBe(42);
     })
 
-    it('non nullable', () => {
+    it('nullable nested object', () => {
         interface Model {
-            a?: number | null,
-            b: number | null
+            a?: {
+                b?: number | null
+            } | null
         }
 
         const fb = new FormBuilder().nonNullable;
 
-        const form: FormModel<Model, null, InferModeNonNullable> = fb.group({
-            a: [42],
-            b: [42]
+        type Form = FormModel<Model, { a: 'group' }, InferModeNonNullable>;
+        type NestedForm = Form['controls']['a']
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<NestedForm['controls']>({
+                b: fb.control(42)
+            })
         })
 
-        expect(form.value.a).toBe(42);
-        expect(form.value.b).toBe(42);
-        expect(form.controls.a.value).toBe(42);
-        expect(form.controls.b.value).toBe(42);
+        expect(form.value.a?.b).toBe(42);
+        expect(form.controls.a.controls.b.value).toBe(42);
     })
 
-    it('nullable', () => {
+    it('nullable array', () => {
+        interface Model {
+            a?: number[] | null
+            b: number[] | null
+        }
+
+        const fb = new FormBuilder().nonNullable;
+
+        type Form = FormModel<Model, { a: 'array', b: 'array' }, InferModeNonNullable>
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array([ fb.control(42) ]),
+            b: fb.array([ fb.control(42) ]),
+        })
+
+        expect(form.value.a![0]).toBe(42);
+        expect(form.value.b![0]).toBe(42);
+        expect(form.controls.a.controls[0].value).toBe(42);
+        expect(form.controls.b.controls[0].value).toBe(42);
+    })
+})
+
+
+describe('InferModeNullable', () => {
+    it('nonnullable flat object', () => {
         interface Model {
             a?: number,
             b: number
         }
 
-        const fb = new FormBuilder().nonNullable;
+        const fb = new FormBuilder();
 
-        const form: FormModel<Model, null, InferModeNullable> = fb.group({
-            a: [<number | null>42],
-            b: [<number | null>42]
+        type Form = FormModel<Model, null, InferModeNullable>
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control(42),
+            b: fb.control(42)
         })
 
         expect(form.value.a).toBe(42);
@@ -63,9 +92,51 @@ describe('Test InferModes', () => {
         expect(form.controls.b.value).toBe(42);
     })
 
-    it('from model', () => {
+    it('nonnullable nested object', () => {
         interface Model {
-            a?: number,
+            a: {
+                b: number
+            }
+        }
+
+        const fb = new FormBuilder().nonNullable;
+
+        type Form = FormModel<Model, { a: 'group' }, InferModeNullable>;
+        type NestedForm = Form['controls']['a']
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<NestedForm['controls']>({
+                b: fb.control(42)
+            })
+        })
+
+        expect(form.value.a?.b).toBe(42);
+        expect(form.controls.a.controls.b.value).toBe(42);
+    })
+
+    it('nonnullable array', () => {
+        interface Model {
+            a: number[]
+        }
+
+        const fb = new FormBuilder().nonNullable;
+
+        type Form = FormModel<Model, { a: 'array' }, InferModeNullable>
+        type FormArrayA = Form['controls']['a']['controls'][0]
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array<FormArrayA>([ fb.control(42) ]),
+        })
+
+        expect(form.value.a![0]).toBe(42);
+        expect(form.controls.a.controls[0].value).toBe(42);
+    })
+})
+
+describe('InferModeFromModel', () => {
+    it('flat object', () => {
+        interface Model {
+            a?: number | string,
             b: number | null
         }
 
@@ -80,21 +151,37 @@ describe('Test InferModes', () => {
 
         expect(form.value.a).toBe(42);
         expect(form.value.b).toBe(42);
-        expect(form.controls.a?.value).toBe(42);
+        expect(form.controls.a.value).toBe(42);
         expect(form.controls.b.value).toBe(42);
-
-        // Without field a
-        const form2: Form = fb.group<Form['controls']>({
-            b: fb.control(42)
-        })
-
-        expect(form2.value.a).toBeUndefined();
-        expect(form2.value.b).toBe(42);
-        expect(form2.controls.a).toBeUndefined();
-        expect(form2.controls.b.value).toBe(42);
     })
 
-    it('non nullalbe & save optionals', () => {
+    // TODO: is it normal behaviour ?
+    it('array', () => {
+        interface Model {
+            a: (number | null)[]
+        }
+
+        const fb = new FormBuilder();
+
+        type Form = FormModel<Model, { a: 'array' }, InferModeFromModel>
+        type FormArrayA = Form['controls']['a']['controls'][0]
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array<FormArrayA>([ fb.control(42) ]),
+        })
+
+        expect(form.value.a![0]).toBe(42);
+        expect(form.controls.a.controls[0].value).toBe(42);
+    })
+});
+
+
+
+
+
+
+describe('InferModeNonNullable & InferModeSaveOptional', () => {
+    it('optional and required', () => {
         interface Model {
             a?: number,
             b: number
@@ -125,8 +212,10 @@ describe('Test InferModes', () => {
         expect(form2.controls.a?.value).toBeUndefined();
         expect(form2.controls.b.value).toBe(42);
     })
+})
 
-    it('nullalbe & save optionals', () => {
+describe('InferModeNonNullable & InferModeSaveOptional', () => {
+    it('optional and required', () => {
         interface Model {
             a?: number,
             b: number
@@ -157,8 +246,10 @@ describe('Test InferModes', () => {
         expect(form2.controls.a?.value).toBeUndefined();
         expect(form2.controls.b.value).toBe(42);
     })
+})
 
-    it('from model & save optionals', () => {
+describe('InferModeNullable & InferModeSaveOptional', () => {
+    it('optional and required', () => {
         interface Model {
             a?: number | null,
             b: number | null
