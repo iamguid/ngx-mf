@@ -31,7 +31,7 @@ describe('Example how to work with pure angular forms', () => {
 
         const formE = fb.array<ModelE>([[42]])
 
-        const formD = fb.group<ModelF>({
+        const formD = fb.group<ModelD>({
             // Oops doesn't work :(
             // @ts-ignore
             e: formE
