@@ -1,9 +1,50 @@
 # ngx-mf
-`ngx-mf` is zero dependency set of types for infer
-angular `FormGroup` type from model type.
+`ngx-mf` is zero dependency set of TypeScript types for recursive
+infer angular `FormGroup`, `FormArray` or `FormControl` type
+from model type.
 
 It doesn't increase your bundle size because it's just
 TypeScript types.
+
+> Q: Why i cannot just use `FormGroup<Model>` ?
+> 
+> A: see [/tests/pure-angular-forms.test.ts (example 1)](https://github.com/iamguid/ngx-mf/blob/master/tests/pure-angular-forms.test.ts)
+
+> Q: Why i cannot define form as `FormGroup` ?
+> 
+> A: Because you loose your types, see [/tests/type-lose.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/type-lose.ts)
+
+> Q: Why i cannot define forms without binding
+> it to model type ?
+> 
+> A: Yes you can, but it's more usefull to bind it
+
+> Q: Why i cannot init form when define it and use
+> `typeof` to infer form type?
+> 
+> A: Yes you can, it is another way to save form type
+> and you can use `typeof` to get type of form,
+> to pass it to the method, see [/tests/define-when-init.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/define-when-init.ts),
+> but when your model will change then you will see
+> errors only in the places where you use `patch`
+> or `setValue` or thomething like that,
+> i think it is inderect errors, but when you bind
+> forms to models you see errors on the form definition
+
+> Q: What about dynamic forms ?
+> 
+> A: In dynamic cases use `Replace` special type
+> to define what you want to infer (see Annotations chapter)
+> You can `Replace` inferred type to something like `FormGroup<any>`
+> and then cast it to your types
+
+> Q: What about complicated forms that includes many of
+> fields, groups and controls
+> 
+> A: I think it is possible to use `ngx-mf` in
+> complicated forms, because you have many instruments
+> to do it, if you cant, then just contact me or create
+> question on github, i will try to answer
 
 ## Installation
 
@@ -25,10 +66,11 @@ $ yarn add ngx-mf --dev
 
 `FormModel<TModel, TAnnotations>` - This is the type
 that recursively turns `TModel` (where `TModel` is your model type)
-into a `FormGroup`.
-You can choose what you want: `FormGroup` or `FormArray` by annotations.
-You can pass `TAnnotations` as the second argument and specify
-output type, you should use special syntax to do it.
+into a `FormGroup`, `FormArray` or `FormControl`.
+You can choose what you want: `FormGroup`, `FormArray` or `FormControl`
+by annotations.
+You can pass `TAnnotations` as the second argument to specify
+output type using special syntax.
 
 For example we have some model like this:
 
@@ -43,19 +85,22 @@ interface IUserModel {
 }
 ```
 
-Lets say we want, for example, infer FormGroup where
+Lets say we want, for example, infer `FormGroup` where
 fields `firstName`, `lastName`, `nickname`, `birthday`
 should be `FormControl` and field `contacts` should be
 `FormArray` of `FormGroups`.
 
 First of all we need to exclude `id` from our model,
-it is needed because all fields are required.
+it is needed because all fields are required by default.
 If we need to exclude some fields we
 should omit or pick them from source model.
 
 ```typescript
 Omit<IUserModel, 'id'>
 ```
+
+Ofcourse you can save optional fields in output type,
+see chapter Infer Mode
 
 If we want to add some field then we should using `&`
 operator, for examle:
@@ -127,9 +172,9 @@ FormGroup<{
 
 ## Infer Modes
 `ngx-mf` have four different InferMode-s: `InferModeNullable`,
-`InferModeNonNullable`, `InferModeFromModel`, and special mode
-`InferModeSaveOptional` with those modes you can manage what you want
-to infer in FormControl.
+`InferModeNonNullable`, `InferModeFromModel` with those modes
+you can manage what you want to infer in `FormControl`, 
+and special mode `InferModeSaveOptional`.
 
 * `InferModeNullable` - infer `FormControl<NonNullable<T> | null>`
 (by default)
@@ -337,44 +382,11 @@ Other examples you can find in annotation tests
 ## Tips And Tricks
 
 * Always pass type `Form['controls']` when you create your
-form. Because it will be more simpler to debug wrong types.
+form. Because it will be more simpler to debug wrong types,
+allow you not to specify controls types.
 
 * Use FormBuilder (`fb.group<Form['controls']>(...)`) or
 constructor (`new FormGroup<Form['controls']>(...)`)
 syntax to define your forms.
-Because if you use array syntax then you can't pass
-argument to FormGroup type.
-
-## Questions
-
-> Q: Why i cannot just use `FormGroup<Model>` ?
-> 
-> A: see [/tests/pure-angular-forms.test.ts (example 1)](https://github.com/iamguid/ngx-mf/blob/master/tests/pure-angular-forms.test.ts)
-
-> Q: Why i cannot define form as `FormGroup` ?
-> 
-> A: Because you loose your types, see [/tests/type-lose.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/type-lose.ts)
-
-> Q: Why i cannot define forms without binding
-> it to model type ?
-> 
-> A: Yes you can, but it's more usefull to bind it
-
-> Q: Why i cannot init form when define it and use
-> `typeof` to infer form type?
-> 
-> A: Yes you can, it is another way to save form type
-> and you can use `typeof` to get type of form,
-> to pass it to the method, see [/test/define-when-init.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/define-when-init.ts),
-> but when your model will change then you will see
-> errors only in the places where you use `patch`
-> or `setValue` or thomething like that,
-> i think it is inderect errors, but when you bind
-> forms to models you see errors on the form definition
-
-> Q: What about dynamic forms ?
-> 
-> A: In dynamic cases use `Replace` special type
-> to define what you want to infer (see Annotations chapter)
-> You can `Replace` inferred type to something like `FormGroup<any>`
-> and then cast it to your types
+Because if you use array syntax, then you can't pass
+argument to FormGroup type and some features wont work.
