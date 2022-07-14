@@ -7,7 +7,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 })
 export class AppComponent implements OnInit {
     form = new FormGroup({
-        firstName: new FormControl<string>(''),
+        firstName: new FormControl(''),
         lastName: new FormControl(''),
         email: new FormControl(''),
         age: new FormControl<number | null>(null, this.validator),

@@ -3,8 +3,8 @@ import "@angular/compiler";
 import { FormBuilder, Validators } from "@angular/forms"
 import { FormModel } from ".."
 
-describe('User form example', () => {
-    it('should work', () => {
+describe('Examples', () => {
+    it('User form example', () => {
         enum ContactType {
             Email,
             Telephone,
@@ -26,14 +26,14 @@ describe('User form example', () => {
 
         const fb = new FormBuilder();
 
-        type ContactForm = FormModel<IContactModel>;
         type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }>;
+        type ContactForm = UserForm['controls']['contacts']['controls'][0];
 
-        const form: UserForm = fb.group({
-            firstName: [<string | null>null],
-            lastName: [<string | null>null],
-            nickname: [<string | null>null],
-            birthday: [<number | null>null],
+        const form: UserForm = fb.group<UserForm['controls']>({
+            firstName: fb.control(null),
+            lastName: fb.control(null),
+            nickname: fb.control(null),
+            birthday: fb.control(null),
             contacts: fb.array<ContactForm>([]),
         });
 
@@ -48,9 +48,9 @@ describe('User form example', () => {
             }],
         }
 
-        form.controls.contacts.controls.push(fb.group({
-            type: [<ContactType | null>ContactType.Email],
-            contact: [<string | null>null, Validators.email],
+        form.controls.contacts.controls.push(fb.group<ContactForm['controls']>({
+            type: fb.control(ContactType.Email),
+            contact: fb.control(null, Validators.email),
         }));
 
         form.patchValue(value);
