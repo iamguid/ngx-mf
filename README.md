@@ -6,6 +6,8 @@ from model type.
 It doesn't increase your bundle size because it's just
 TypeScript types.
 
+## Questions
+
 > Q: Why i cannot just use `FormGroup<Model>` ?
 > 
 > A: see [/tests/pure-angular-forms.test.ts (example 1)](https://github.com/iamguid/ngx-mf/blob/master/tests/pure-angular-forms.test.ts)
@@ -45,6 +47,15 @@ TypeScript types.
 > complicated forms, because you have many instruments
 > to do it, if you cant, then just contact me or create
 > question on github, i will try to answer
+
+## Restrictions
+
+* You can't put objects like Date to your model, because it doesn't work
+correctly and type would be incorrect, but if you need it you can workaround it
+with `Replace`
+
+* You cant use array syntax with `FormControlState`, but in other syntax
+(with constructor and FormBuilder) it works
 
 ## Installation
 
