@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
-import { FormModel } from ".."
+import { FormModel, InferModeNullable } from ".."
 
 interface SimpleModel {
     a: number;
@@ -20,7 +20,7 @@ interface ArrayModel {
 describe('Test different form definition syntax', () => {
     describe('Plain forms', () => {
         it('constructor syntax', () => {
-            const form: FormModel<SimpleModel> = new FormGroup({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = new FormGroup({
                 a: new FormControl(42)
             })
 
@@ -31,7 +31,7 @@ describe('Test different form definition syntax', () => {
         it('FormBuilder syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = fb.group({
                 a: fb.control(42)
             })
 
@@ -42,7 +42,7 @@ describe('Test different form definition syntax', () => {
         it('array syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = fb.group({
                 a: [42]
             })
 
@@ -53,7 +53,7 @@ describe('Test different form definition syntax', () => {
 
     describe('Nested FormGroup', () => {
         it('constructor syntax', () => {
-            const form: FormModel<NestedModel, { a: 'group' }> = new FormGroup({
+            const form: FormModel<NestedModel, { a: 'group' }, InferModeNullable> = new FormGroup({
                 a: new FormGroup({
                     b: new FormControl(42)
                 })
@@ -66,7 +66,7 @@ describe('Test different form definition syntax', () => {
         it('FormBuilder syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<NestedModel, { a: 'group' }> = fb.group({
+            const form: FormModel<NestedModel, { a: 'group' }, InferModeNullable> = fb.group({
                 a: fb.group({
                     b: fb.control(42)
                 })
@@ -79,7 +79,7 @@ describe('Test different form definition syntax', () => {
         it('array syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<NestedModel, { a: 'group' }> = fb.group({
+            const form: FormModel<NestedModel, { a: 'group' }, InferModeNullable> = fb.group({
                 a: fb.group({
                     b: [42]
                 })
@@ -92,7 +92,7 @@ describe('Test different form definition syntax', () => {
 
     describe('Nested FormArray', () => {
         it('constructor syntax', () => {
-            const form: FormModel<ArrayModel, { a: 'array' }> = new FormGroup({
+            const form: FormModel<ArrayModel, { a: 'array' }, InferModeNullable> = new FormGroup({
                 a: new FormArray([
                     new FormControl(42)
                 ])
@@ -105,7 +105,7 @@ describe('Test different form definition syntax', () => {
         it('FormBuilder syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<ArrayModel, { a: 'array' }> = fb.group({
+            const form: FormModel<ArrayModel, { a: 'array' }, InferModeNullable> = fb.group({
                 a: fb.array([
                     fb.control(42)
                 ])
@@ -118,7 +118,7 @@ describe('Test different form definition syntax', () => {
 
     describe('from with validators', () => {
         it('constructor syntax', () => {
-            const form: FormModel<SimpleModel> = new FormGroup({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = new FormGroup({
                 a: new FormControl(42, [Validators.required])
             })
 
@@ -129,7 +129,7 @@ describe('Test different form definition syntax', () => {
         it('FormBuilder syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = fb.group({
                 a: fb.control(42, [Validators.required])
             })
 
@@ -140,7 +140,7 @@ describe('Test different form definition syntax', () => {
         it('array syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = fb.group({
                 a: [42, [Validators.required]]
             })
 
@@ -151,7 +151,7 @@ describe('Test different form definition syntax', () => {
 
     describe('value as FormControlState', () => {
         it('constructor syntax', () => {
-            const form: FormModel<SimpleModel> = new FormGroup({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = new FormGroup({
                 a: new FormControl({ value: 42, disabled: false })
             })
 
@@ -162,7 +162,7 @@ describe('Test different form definition syntax', () => {
         it('FormBuilder syntax', () => {
             const fb = new FormBuilder();
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = fb.group({
                 a: fb.control({ value: 42, disabled: false })
             })
 
@@ -175,7 +175,7 @@ describe('Test different form definition syntax', () => {
 
             // TODO: Doesn't work :(
             // @ts-ignore
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: FormModel<SimpleModel, null, InferModeNullable> = fb.group({
                 a: [{ value: 42, disabled: false }]
             })
 

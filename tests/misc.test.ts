@@ -11,7 +11,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model>;
+        type Form = FormModel<Model, null, InferModeNullable>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42)
@@ -30,7 +30,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'group' }>;
+        type Form = FormModel<Model, { a: 'group' }, InferModeNullable>;
         type NestedForm = NonNullable<Form['controls']['a']['controls']>;
 
         const form: Form = fb.group<Form['controls']>({
@@ -52,7 +52,7 @@ describe('Misc tests', () => {
 
         // TODO: Doesn't work :(
         // @ts-ignore
-        const form: FormModel<Model> = fb.group({
+        const form: FormModel<Model, null, InferModeNullable> = fb.group({
             a: [new Date('2022-07-08T06:46:28.452Z')]
         })
 
@@ -68,7 +68,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Omit<Model, 'a'>> = fb.group({
+        const form: FormModel<Omit<Model, 'a'>, null, InferModeNullable> = fb.group({
             b: [42]
         })
 
@@ -140,7 +140,7 @@ describe('Misc tests', () => {
             },
         });
 
-        const form2: FormModel<Model, { b: 'array' }> = fb.group({
+        const form2: FormModel<Model, { b: 'array' }, InferModeNullable> = fb.group({
             a: [42],
             b: fb.array([['test']]),
             c: [{
@@ -169,7 +169,7 @@ describe('Misc tests', () => {
             },
         });
 
-        const form3: FormModel<Model, { c: 'group' }> = fb.group({
+        const form3: FormModel<Model, { c: 'group' }, InferModeNullable> = fb.group({
             a: [42],
             b: [['test']],
             c: fb.group({
@@ -192,7 +192,7 @@ describe('Misc tests', () => {
         expect(form3.controls.c.controls.d.value).toStrictEqual({ e: [43], });
         expect(form3.controls.c.controls.f.value).toStrictEqual({ g: 'test' });
                     
-        const form4: FormModel<Model, { c: { f: 'group' } }> = fb.group({
+        const form4: FormModel<Model, { c: { f: 'group' } }, InferModeNullable> = fb.group({
             a: [42],
             b: [['test']],
             c: fb.group({
@@ -244,7 +244,7 @@ describe('Misc tests', () => {
                 d: 'group',
                 f: 'group',
             },
-        }> = fb.group({
+        }, InferModeNullable> = fb.group({
             a: [42],
             b: fb.array([['test']]),
             c: fb.group({
@@ -284,7 +284,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: { b: 'group' }, d: { e: 'group' } }> = fb.group({
+        const form: FormModel<Model, { a: { b: 'group' }, d: { e: 'group' } }, InferModeNullable> = fb.group({
             a: fb.group({
                 b: fb.group({
                     c: [42]
@@ -308,7 +308,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model & { b: string }> = fb.group({
+        const form: FormModel<Model & { b: string }, null, InferModeNullable> = fb.group({
             a: [42],
             b: ['test'],
         })

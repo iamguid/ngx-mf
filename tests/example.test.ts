@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, Validators } from "@angular/forms"
-import { FormModel } from ".."
+import { FormModel, InferModeNullable } from ".."
 
 describe('Examples', () => {
     it('User form example', () => {
@@ -26,7 +26,7 @@ describe('Examples', () => {
 
         const fb = new FormBuilder();
 
-        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }>;
+        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }, InferModeNullable>;
         type ContactForm = UserForm['controls']['contacts']['controls'][0];
 
         const form: UserForm = fb.group<UserForm['controls']>({
