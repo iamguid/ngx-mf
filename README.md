@@ -334,6 +334,17 @@ Now let's say that `c.d.e` should be `FormArray`
 Other examples you can find in annotation tests
 [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
 
+## Tips And Tricks
+
+* Always pass type `Form['controls']` when you create your
+form. Because it will be more simpler to debug wrong types.
+
+* Use FormBuilder (`fb.group<Form['controls']>(...)`) or
+constructor (`new FormGroup<Form['controls']>(...)`)
+syntax to define your forms.
+Because if you use array syntax then you can't pass
+argument to FormGroup type.
+
 ## Questions
 
 > Q: Why i cannot just use `FormGroup<Model>` ?
