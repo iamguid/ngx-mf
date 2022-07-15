@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormControl } from "@angular/forms";
-import { FormModel, InferModeNullable, Replace } from "..";
+import { FormModel, InferModeNullable, Replace } from "../src";
 
 describe('Test FormModel annotations', () => {
     it('all primitives without annotations', () => {

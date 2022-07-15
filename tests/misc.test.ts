@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional } from "..";
+import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional } from "../src";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field', () => {

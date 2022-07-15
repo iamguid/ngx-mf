@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, Validators } from "@angular/forms"
-import { FormModel, InferModeNullable } from ".."
+import { FormModel, InferModeNullable } from "../src"
 
 describe('Examples', () => {
     it('User form example', () => {

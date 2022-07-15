@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
-import { FormModel, InferModeNullable } from ".."
+import { FormModel, InferModeNullable } from "../src"
 
 interface SimpleModel {
     a: number;

@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder } from "@angular/forms"
-import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "..";
+import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
 
 describe('InferModeNonNullable', () => {
     it('nullable flat object', () => {
