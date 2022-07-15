@@ -356,4 +356,25 @@ describe('Misc tests', () => {
         expect(form2.controls.a.value).toBe(42);
         expect(form2.controls.b?.value).toBe(42);
     })
+
+    it('get conntrols inside optional field', () => {
+        interface Model {
+            a: {
+                b: number
+            }
+        }
+
+        const fb = new FormBuilder();
+
+        type Form = FormModel<Model, { a: 'group' }, InferModeNullable & InferModeOptional>
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<NonNullable<Form['controls']['a']>['controls']>({
+                b: fb.control(42)
+            })
+        })
+
+        expect(form.value.a?.b).toBe(42);
+        expect(form.controls.a?.controls.b?.value).toBe(42);
+    })
 })
