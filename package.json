@@ -1,6 +1,6 @@
 {
   "name": "ngx-mf",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Bind your model types to angular FormGroup type",
   "main": "src/index.ts",
   "repository": {
