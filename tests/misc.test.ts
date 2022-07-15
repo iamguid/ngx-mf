@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeSaveOptional } from "..";
+import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional } from "..";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field', () => {
@@ -215,7 +215,7 @@ describe('Misc tests', () => {
         expect(form4.controls.c.controls.d.value).toStrictEqual({ e: [43] });
         expect(form4.controls.c.controls.f.controls.g.value).toBe('test');
 
-        const form5: FormModel<Model, { c: { d: { e: 'array' } } }> = fb.group({
+        const form5: FormModel<Model, { c: { d: { e: 'array' } } }, InferModeNullable> = fb.group({
             a: [42],
             b: [['test']],
             c: fb.group({
@@ -320,7 +320,7 @@ describe('Misc tests', () => {
         expect(form.controls.b.value).toBe('test');
     })
 
-    it('forms union', () => {
+    it('forms union where some fields are required and some is optional', () => {
         interface ModelA {
             a?: number;
         }
@@ -330,7 +330,7 @@ describe('Misc tests', () => {
         }
 
         type Form1 = FormModel<ModelA, null, InferModeNonNullable>;
-        type Form2 = FormModel<ModelB, null, InferModeNullable & InferModeSaveOptional>;
+        type Form2 = FormModel<ModelB, null, InferModeNullable & InferModeOptional>;
         type UnionFormGroupControls = Form1['controls'] & Form2['controls'];
 
         const fb = new FormBuilder();

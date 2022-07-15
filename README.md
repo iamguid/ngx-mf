@@ -182,24 +182,24 @@ FormGroup<{
 ```
 
 ## Infer Modes
-`ngx-mf` have four different InferMode-s: `InferModeNullable`,
-`InferModeNonNullable`, `InferModeFromModel` with those modes
-you can manage what you want to infer in `FormControl`, 
-and special mode `InferModeSaveOptional`.
+`ngx-mf` have different InferMode-s: by `InferModeNullable`
+and `InferModeNonNullable` you can manage, what you want to
+infer in `FormControl`.
+By `InferModeOptional`, `InferModeRequired`, `InferModeFromModel`
+you can define nesting behavior of fields.
 
 * `InferModeNullable` - infer `FormControl<NonNullable<T> | null>`
 (by default)
 * `InferModeNonNullable` - infer `FormControl<NonNullable<T>`
 * `InferModeFromModel` - infer `FormControl<Exclude<T, undefined>>`
-* `InferModeSaveOptional` - save optionals fields (`field?:`) or not
+and makes model optional fields as optional (`field?:`) in form type
+* `InferModeOptional` - makes all form fields optional
+* `InferModeRequired` - makes all form fields required
 
-If `InferModeSaveOptional` is not provided then each model field
-will be required, otherwise each field will be optional if source field
-is optional.
-
-You can combine `InferModeSaveOptional` with other modes with type union,
-for example `InferModeNullable & InferModeSaveOptional` means that each
-field should saves optional but every field will be nullable.
+You can combine `InferModeOptional` and `InferModeRequired` with modes
+`InferModeNullable` and `InferModeNonNullable` using type union,
+for example `InferModeNullable & InferModeOptional` means that each
+field should be optional and every field will be nullable.
 
 ## Examples Of Usage
 

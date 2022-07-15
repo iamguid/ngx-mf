@@ -12,17 +12,18 @@ export type FormModel<
 export type Replace<T> = T & { __replace__: '__replace__' };
 
 // Default infer mode 
-type DefaultInferMode = InferModeNullable
+type DefaultInferMode = InferModeNullable & InferModeRequired
 
 // Form element types for annotations
 type FormElementType = 'control' | 'group' | 'array';
 
 // Variants of infer modes
-export type InferModeSaveOptional = { __saveoptional__: '__saveoptional__' }
+export type InferModeOptional = { __optional__: '__optional__' }
+export type InferModeRequired = { __required__: '__required__' }
+export type InferModeFromModel = { __frommodel__: '__frommodel__' }
 export type InferModeNullable = { __nullable__: '__nullable__' }
 export type InferModeNonNullable = { __nonnullable__: '__nonnullable__' }
-export type InferModeFromModel = { __frommodel__: '__frommodel__' }
-type InferMode = InferModeSaveOptional | InferModeNullable | InferModeNonNullable | InferModeFromModel;
+type InferMode = InferModeOptional | InferModeRequired | InferModeFromModel | InferModeNullable | InferModeNonNullable;
 
 // Convert T to annotations type recursively
 type TransformToAnnotations<T> = {
@@ -56,16 +57,26 @@ type RemoveOptionalFields<T> = {
 }
 
 export type PrepareModel<T, TInferMode extends InferMode> = 
-  TInferMode extends InferModeSaveOptional & (InferModeNullable | InferModeNonNullable | InferModeFromModel)  
-    ? InferModeSaveOptional & InferModeNullable extends TInferMode  
-      ? { [key in keyof T]: NonNullable<T[key]> | null }
+  TInferMode extends InferModeOptional & (InferModeNullable | InferModeNonNullable | InferModeFromModel)  
+    ? InferModeOptional & InferModeNullable extends TInferMode  
+      ? { [key in keyof T]?: NonNullable<T[key]> | null }
 
-    : InferModeSaveOptional & InferModeNonNullable extends TInferMode 
-      ? { [key in keyof T]: NonNullable<T[key]> }
+    : InferModeOptional & InferModeNonNullable extends TInferMode 
+      ? { [key in keyof T]?: NonNullable<T[key]> }
 
-    : InferModeSaveOptional & InferModeFromModel extends TInferMode  
-      ? { [key in keyof T]: T[key] }
+    : InferModeOptional & InferModeFromModel extends TInferMode  
+      ? { [key in keyof T]?: T[key] }
+    : never
 
+  : TInferMode extends InferModeRequired & (InferModeNullable | InferModeNonNullable | InferModeFromModel)  
+    ? InferModeRequired & InferModeNullable extends TInferMode  
+      ? { [key in keyof T]-?: NonNullable<T[key]> | null }
+
+    : InferModeRequired & InferModeNonNullable extends TInferMode 
+      ? { [key in keyof T]-?: NonNullable<T[key]> }
+
+    : InferModeRequired & InferModeFromModel extends TInferMode  
+      ? { [key in keyof T]-?: T[key] }
     : never
 
   : InferModeNullable extends TInferMode  
@@ -75,7 +86,7 @@ export type PrepareModel<T, TInferMode extends InferMode> =
     ? { [key in keyof T]-?: NonNullable<T[key]> }
 
   : InferModeFromModel extends TInferMode
-    ? { [key in keyof T]-?: T[key] }
+    ? { [key in keyof T]: T[key] }
 
   : never;
 
@@ -83,10 +94,10 @@ type FormArrayUtil<T, TInferMode extends InferMode> =
   T extends Array<infer U>
     ? FormArray<FormControl<
       InferModeNullable extends TInferMode  
-        ? NonNullable<U> | null
-        : InferModeNonNullable extends TInferMode 
-        ? NonNullable<U>
-        : Exclude<U, undefined>
+      ? NonNullable<U> | null
+      : InferModeNonNullable extends TInferMode 
+      ? NonNullable<U>
+      : Exclude<U, undefined>
     >>
     : never;
 
