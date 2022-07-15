@@ -50,10 +50,6 @@ TypeScript types.
 
 ## Restrictions
 
-* You can't put objects like Date to your model, because it doesn't work
-correctly and type would be incorrect, but if you need it you can workaround it
-with `Replace`
-
 * You cant use array syntax with `FormControlState`, but in other syntax
 (with constructor and FormBuilder) it works
 

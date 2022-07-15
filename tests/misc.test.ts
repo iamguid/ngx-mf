@@ -43,21 +43,19 @@ describe('Misc tests', () => {
         expect(form.controls.a?.controls?.b.value).toBe(42);
     })
 
-    it.skip('Date inside FormControl', () => {
+    it('Date inside FormControl', () => {
         interface Model {
             a: Date;
         }
 
         const fb = new FormBuilder();
 
-        // TODO: Doesn't work :(
-        // @ts-ignore
         const form: FormModel<Model, null, InferModeNullable> = fb.group({
             a: [new Date('2022-07-08T06:46:28.452Z')]
         })
 
-        // expect(form.value.a?.toISOString()).toBe(new Date('2022-07-08T06:46:28.452Z').toISOString());
-        // expect(form.controls.a.value?.toISOString()).toBe(new Date('2022-07-08T06:46:28.452Z').toISOString());
+        expect(form.value.a?.toISOString()).toBe(new Date('2022-07-08T06:46:28.452Z').toISOString());
+        expect(form.controls.a.value?.toISOString()).toBe(new Date('2022-07-08T06:46:28.452Z').toISOString());
     })
 
     it('FormModel after Omit', () => {
