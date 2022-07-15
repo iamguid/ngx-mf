@@ -2,7 +2,8 @@
   "name": "ngx-mf",
   "version": "1.4.3",
   "description": "Bind your model types to angular FormGroup type",
-  "main": "src/index.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/iamguid/ngx-mf"
@@ -22,7 +23,7 @@
   "author": "Vladislav <iam.guid@gmail.com>",
   "license": "MIT",
   "private": false,
-  "type": "module",
+  "type": "commonjs",
   "devDependencies": {
     "@angular/common": "^14.0.5",
     "@angular/compiler": "^14.0.5",
