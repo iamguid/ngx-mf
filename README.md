@@ -81,18 +81,17 @@ FormGroup<{
 
 > Q: What about dynamic forms ?
 > 
-> A: In dynamic cases use `Replace` special type
+> A: you can make some fields optional and enable/disable
+> it when you need it.
+> You can use `Replace` special type
 > to define what you want to infer (see Annotations chapter)
 > You can `Replace` inferred type to something like `FormGroup<any>`
-> and then cast it to your types
+> and then cast it to your types.
 
 > Q: What about complicated forms that includes many of
 > fields, groups and controls
 > 
-> A: I think it is possible to use `ngx-mf` in
-> complicated forms, because you have many instruments
-> to do it, if you cant, then just contact me or create
-> question on github, i will try to answer
+> A: It is the main idea of `ngx-mf` :)
 
 ## Restrictions
 
@@ -118,7 +117,7 @@ $ yarn add ngx-mf --dev
 `ngx-mf` exports type `FormModel`
 
 `FormModel<TModel, TAnnotations>` - This is the type
-that recursively turns `TModel` (where `TModel` is your model type)
+that recursively turns `TModel` fields (where `TModel` is your model type)
 into a `FormGroup`, `FormArray` or `FormControl`.
 You can choose what you want: `FormGroup`, `FormArray` or `FormControl`
 by annotations.
