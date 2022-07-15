@@ -184,6 +184,27 @@ describe('InferModeFromModel', () => {
         expect(form.value.a![0]).toBe(42);
         expect(form.controls.a.controls[0].value).toBe(42);
     })
+
+    it('nested object', () => {
+        interface Model {
+            a?: {
+                b?: number
+            }
+        }
+
+        const fb = new FormBuilder();
+
+        type Form = FormModel<Model, { a: 'group' }, InferModeFromModel>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<NonNullable<Form['controls']['a']>['controls']>({
+                b: fb.control(42, { nonNullable: true })
+            }),
+        })
+
+        expect(form.value.a?.b).toBe(42);
+        expect(form.controls.a?.controls.b?.value).toBe(42);
+    })
 });
 
 describe('InferModeNonNullable & InferModeOptional', () => {

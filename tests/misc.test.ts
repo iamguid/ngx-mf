@@ -357,7 +357,7 @@ describe('Misc tests', () => {
         expect(form2.controls.b?.value).toBe(42);
     })
 
-    it('get conntrols inside optional field', () => {
+    it('get conntrols inside optional fields', () => {
         interface Model {
             a: {
                 b: number
@@ -376,5 +376,30 @@ describe('Misc tests', () => {
 
         expect(form.value.a?.b).toBe(42);
         expect(form.controls.a?.controls.b?.value).toBe(42);
+    })
+
+    it('corrupting objects', () => {
+        interface Model {
+            a: {
+                b: {
+                    c: number
+                }
+            }
+        }
+
+        const fb = new FormBuilder();
+
+        type Form = FormModel<Model, 'group', InferModeNullable & InferModeOptional>
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control({
+                b: {
+                    c: 42
+                }
+            })
+        })
+
+        expect(form.value.a?.b).toStrictEqual({ c: 42 });
+        expect(form.controls.a?.value?.b).toStrictEqual({ c: 42 });
     })
 })

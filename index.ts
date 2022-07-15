@@ -102,11 +102,19 @@ type FormArrayUtil<T, TInferMode extends InferMode> =
     : never;
 
 type FormControlUtil<T, TInferMode extends InferMode> = FormControl<
-  TInferMode extends InferModeNullable
-  ? NonNullable<T> | null
-  : TInferMode extends InferModeNonNullable
-  ? NonNullable<T>
-  : Exclude<T, undefined>
+  T extends object 
+  ? T extends RemoveOptionalFields<infer U>
+    ? TInferMode extends InferModeNullable
+      ? NonNullable<U> | null
+      : TInferMode extends InferModeNonNullable
+      ? NonNullable<U>
+      : Exclude<U, undefined>
+    : never
+  : TInferMode extends InferModeNullable
+    ? NonNullable<T> | null
+    : TInferMode extends InferModeNonNullable
+    ? NonNullable<T>
+    : Exclude<T, undefined>
 >;
 
 // Traverse every key in object and transform it to form element recursive
