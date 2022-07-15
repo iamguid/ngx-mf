@@ -6,6 +6,52 @@ from model type.
 It doesn't increase your bundle size because it's just
 TypeScript types.
 
+## How It Works
+
+We define some model:
+
+```typescript
+enum ContactType {
+    Email,
+    Telephone,
+}
+
+interface IContactModel {
+    type: ContactType;
+    contact: string;
+}
+
+interface IUserModel {
+    id: number;
+    firstName: string;
+    lastName: string;
+    nickname: string;
+    birthday: Date;
+    contacts: IContactModel[];
+}
+```
+
+Then we define some magic type, like:
+
+```typescript
+Type Form = FormModel<IUserModel, { contacts: ['group'] }>
+```
+
+Then we have type, based on our model, before form will be init:
+
+```typescript
+FormGroup<{
+    firstName: FormControl<string | null>;
+    lastName: FormControl<string | null>;
+    nickname: FormControl<string | null>;
+    birthday: FormControl<Date | null>;
+    contacts: FormArray<FormGroup<{
+        type: FormControl<ContactType | null>;
+        contact: FormControl<string | null>;
+    }>>;
+}>
+```
+
 ## Questions
 
 > Q: Why i cannot just use `FormGroup<Model>` ?
