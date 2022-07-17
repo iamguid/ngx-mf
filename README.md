@@ -442,3 +442,9 @@ constructor (`new FormGroup<Form['controls']>(...)`)
 syntax to define your forms.
 Because if you use array syntax, then you can't pass
 argument to FormGroup type and some features wont work.
+
+## Links
+* Reddit topic - https://www.reddit.com/r/angular/comments/vv2xmd/what_do_you_think_about_generating_formgroup_type/
+* Stackoverflow questions - https://stackoverflow.com/questions/72500855/formbuilder-with-strongly-typed-form-in-ng14 https://stackoverflow.com/questions/72507263/angular-14-strictly-typed-reactive-forms-how-to-type-formgroup-model-using-exi
+* Dev.to article - https://dev.to/iamguid/new-way-to-cook-angular-14-typed-forms-1g7h
+* Medium article - https://medium.com/p/1ffebf193df
