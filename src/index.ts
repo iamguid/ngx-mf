@@ -59,7 +59,7 @@ type RemoveOptionalFields<T> = {
     : T[key]
 }
 
-export type PrepareModel<T, TInferMode extends InferMode> = 
+type PrepareModel<T, TInferMode extends InferMode> = 
   TInferMode extends InferModeOptional & (InferModeNullable | InferModeNonNullable | InferModeFromModel)  
     ? InferModeOptional & InferModeNullable extends TInferMode  
       ? { [key in keyof T]?: NonNullable<T[key]> | null }

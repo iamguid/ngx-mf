@@ -28,7 +28,7 @@ declare type TransformToAnnotations<T> = {
 declare type RemoveOptionalFields<T> = {
     [key in keyof T]-?: T[key] extends (infer U)[] ? RemoveOptionalFields<U>[] : T[key] extends object ? RemoveOptionalFields<T[key]> : T[key];
 };
-export declare type PrepareModel<T, TInferMode extends InferMode> = TInferMode extends InferModeOptional & (InferModeNullable | InferModeNonNullable | InferModeFromModel) ? InferModeOptional & InferModeNullable extends TInferMode ? {
+declare type PrepareModel<T, TInferMode extends InferMode> = TInferMode extends InferModeOptional & (InferModeNullable | InferModeNonNullable | InferModeFromModel) ? InferModeOptional & InferModeNullable extends TInferMode ? {
     [key in keyof T]?: NonNullable<T[key]> | null;
 } : InferModeOptional & InferModeNonNullable extends TInferMode ? {
     [key in keyof T]?: NonNullable<T[key]>;
