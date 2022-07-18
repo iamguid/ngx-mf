@@ -7,7 +7,7 @@ It doesn't increase your bundle size because it's just
 TypeScript types.
 
 WARNING: I found some issues in TypeScript,
-for workaround it I use some @ts-ignore,
+for workaround it I use @ts-ignore,
 if it critical for your project don't use that library.
 Because in future TypeScript releases library may break down
 
