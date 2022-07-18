@@ -195,7 +195,7 @@ type FormControlsOfInnerTraverse<
   : TAnnotations extends Array<infer TInferedAnnotations>
     ? TTraverseModel extends Array<infer TInferedArrayType>
       // @ts-ignore - because typescript has some issues
-      ? FormArray<FormControlsOfInnerTraverse<TModel extends Array<infer U> ? U : unknown, TInferedArrayType, TInferMode, TInferedAnnotations>>
+      ? FormArray<FormControlsOfInnerTraverse<NonNullable<TModel> extends Array<infer U> ? U : unknown, TInferedArrayType, TInferMode, TInferedAnnotations>>
       : never
 
   // FormGroup type annotation
