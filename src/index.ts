@@ -1,15 +1,12 @@
-// @ts-nocheck
-// It is because typescript have some issues, but we workaround it
-
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
-// Default type
+// Main type
 export type FormModel<
   TModel extends object,
   TAnnotations extends TransformToAnnotations<TTraverseModel> | null = null,
   TInferMode extends InferMode = DefaultInferMode,
   TTraverseModel extends RemoveOptionalFields<TModel> = RemoveOptionalFields<TModel>
-> = FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, TAnnotations>
+> = FormModelInnerTraverse<TModel, TTraverseModel, TInferMode, TAnnotations>
 
 // Special type for annotation
 export type Replace<T> = T & { __replace__: '__replace__' };
@@ -124,8 +121,8 @@ type FormControlUtil<T, TInferMode extends InferMode> = FormControl<
     : Exclude<T, undefined>
 >;
 
-// Traverse every key in object and transform it to form element recursive
-type FormControlsOfInnerKeyofTraverse<
+// Traverse every key in object and transform it to form element recursively
+type FormModelInnerKeyofTraverse<
   TModel extends object | unknown,
   TTraverseModel extends object | unknown,
   TInferMode extends InferMode,
@@ -134,11 +131,11 @@ type FormControlsOfInnerKeyofTraverse<
 > = {
   [key in keyof TPreparedModel]:
     // @ts-ignore - because typescript has some issues
-    FormControlsOfInnerTraverse<TModel[key], TTraverseModel[key], TInferMode, TAnnotations[key]>
+    FormModelInnerTraverse<TModel[key], TTraverseModel[key], TInferMode, TAnnotations[key]>
 }
 
 // Infer type of current object as form element type recursively
-type FormControlsOfInnerTraverse<
+type FormModelInnerTraverse<
   TModel extends object | unknown,
   TTraverseModel extends object | unknown,
   TInferMode extends InferMode,
@@ -147,10 +144,10 @@ type FormControlsOfInnerTraverse<
   // When annotations is not set
   TAnnotations extends null
   ? TTraverseModel extends Array<any>
-    ? FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'array'>
+    ? FormModelInnerTraverse<TModel, TTraverseModel, TInferMode, 'array'>
     : TTraverseModel extends object
-    ? FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'group'>
-    : FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'control'>
+    ? FormModelInnerTraverse<TModel, TTraverseModel, TInferMode, 'group'>
+    : FormModelInnerTraverse<TModel, TTraverseModel, TInferMode, 'control'>
 
   // Replace annotation
   //
@@ -177,7 +174,7 @@ type FormControlsOfInnerTraverse<
   : TAnnotations extends 'group'
     ? TTraverseModel extends object
       // @ts-ignore - because typescript has some issues
-      ? FormGroup<FormControlsOfInnerKeyofTraverse<NonNullable<TModel>, TTraverseModel, TInferMode, null>>
+      ? FormGroup<FormModelInnerKeyofTraverse<NonNullable<TModel>, TTraverseModel, TInferMode, null>>
       : never
 
   // FormControl string annotation
@@ -195,7 +192,7 @@ type FormControlsOfInnerTraverse<
   : TAnnotations extends Array<infer TInferedAnnotations>
     ? TTraverseModel extends Array<infer TInferedArrayType>
       // @ts-ignore - because typescript has some issues
-      ? FormArray<FormControlsOfInnerTraverse<NonNullable<TModel> extends Array<infer U> ? U : unknown, TInferedArrayType, TInferMode, TInferedAnnotations>>
+      ? FormArray<FormModelInnerTraverse<NonNullable<TModel> extends Array<infer U> ? U : unknown, TInferedArrayType, TInferMode, TInferedAnnotations>>
       : never
 
   // FormGroup type annotation
@@ -206,7 +203,7 @@ type FormControlsOfInnerTraverse<
   : TAnnotations extends object
     ? TTraverseModel extends object
       // @ts-ignore - because typescript has some issues
-      ? FormGroup<FormControlsOfInnerKeyofTraverse<NonNullable<TModel>, TTraverseModel, TInferMode, TAnnotations>>
+      ? FormGroup<FormModelInnerKeyofTraverse<NonNullable<TModel>, TTraverseModel, TInferMode, TAnnotations>>
       : never
 
-  : FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'control'>
+  : FormModelInnerTraverse<TModel, TTraverseModel, TInferMode, 'control'>
