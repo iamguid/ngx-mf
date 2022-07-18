@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional } from "../src";
+import { FormModel, InferModeNonNullable, InferModeNullable, InferModeOptional } from "../src";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field', () => {
@@ -399,5 +399,31 @@ describe('Misc tests', () => {
 
         expect(form.value.a?.b).toStrictEqual({ c: 42 });
         expect(form.controls.a?.value?.b).toStrictEqual({ c: 42 });
+    })
+
+    it('FUCK', () => {
+        interface Model2 {
+            a?: number;
+            b?: number;
+        }
+
+        interface Model {
+            a?: {
+                b?: Model2
+            }
+        }
+
+        const fb = new FormBuilder();
+
+        type Form = FormModel<Model, { a: { b: 'control' } }>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({
+                b: fb.control<Model2 | null>(null)
+            })
+        })
+
+        expect(form.value.a?.b).toBeNull();
+        expect(form.controls.a.controls.b.value).toBeNull();
     })
 })
