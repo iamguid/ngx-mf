@@ -6,6 +6,11 @@ from model type.
 It doesn't increase your bundle size because it's just
 TypeScript types.
 
+WARNING: I found some issues in TypeScript,
+for workaround it I use some @ts-ignore,
+if it critical for your project don't use that library.
+Because in future TypeScript releases library may break down
+
 ## How It Works
 
 We define some model:

@@ -1,3 +1,4 @@
+// @ts-nocheck 
 import { OnInit } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 declare const form: FormGroup<{
@@ -11,3 +12,4 @@ export declare class AppComponent implements OnInit {
     doThomthingWithForm(f: typeof form): void;
 }
 export {};
+//# sourceMappingURL=define-when-init.d.ts.map

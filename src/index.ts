@@ -1,3 +1,6 @@
+// @ts-nocheck
+// It is because typescript have some issues, but we workaround it
+
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 
 // Default type
@@ -126,7 +129,7 @@ type FormControlsOfInnerKeyofTraverse<
   TPreparedModel = PrepareModel<TModel, TInferMode>
 > = {
   [key in keyof TPreparedModel]:
-    // @ts-ignore
+    // @ts-ignore - because typescript has some issues
     FormControlsOfInnerTraverse<TModel[key], TTraverseModel[key], TInferMode, TAnnotations[key]>
 }
 
@@ -135,7 +138,7 @@ type FormControlsOfInnerTraverse<
   TModel extends object | unknown,
   TTraverseModel extends object | unknown,
   TInferMode extends InferMode,
-  TAnnotations extends object | string | null,
+  TAnnotations extends object | string | unknown | null,
 > =
   // When annotations is not set
   TAnnotations extends null
@@ -143,7 +146,7 @@ type FormControlsOfInnerTraverse<
     ? FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'array'>
     : TTraverseModel extends object
     ? FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'group'>
-    : FormControlUtil<TModel extends unknown ? TTraverseModel : TModel, TInferMode>
+    : FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'control'>
 
   // Replace annotation
   //
@@ -169,7 +172,7 @@ type FormControlsOfInnerTraverse<
   // then infer FormGroup type recursively
   : TAnnotations extends 'group'
     ? TTraverseModel extends object
-      // @ts-ignore
+      // @ts-ignore - because typescript has some issues
       ? FormGroup<FormControlsOfInnerKeyofTraverse<NonNullable<TModel>, TTraverseModel, TInferMode, null>>
       : never
 
@@ -187,7 +190,7 @@ type FormControlsOfInnerTraverse<
   // then infer FormArray type recursively
   : TAnnotations extends Array<infer TInferedAnnotations>
     ? TTraverseModel extends Array<infer TInferedArrayType>
-      // @ts-ignore
+      // @ts-ignore - because typescript has some issues
       ? FormArray<FormControlsOfInnerTraverse<TModel extends Array<infer U> ? U : unknown, TInferedArrayType, TInferMode, TInferedAnnotations>>
       : never
 
@@ -198,12 +201,8 @@ type FormControlsOfInnerTraverse<
   // then infer FormGroup type recursively
   : TAnnotations extends object
     ? TTraverseModel extends object
-      // @ts-ignore
+      // @ts-ignore - because typescript has some issues
       ? FormGroup<FormControlsOfInnerKeyofTraverse<NonNullable<TModel>, TTraverseModel, TInferMode, TAnnotations>>
       : never
 
-  // When annotations is unknown
-  : TAnnotations extends unknown
-    ? FormControlUtil<TModel extends unknown ? TTraverseModel : TModel, TInferMode>
-
-  : never
+  : FormControlsOfInnerTraverse<TModel, TTraverseModel, TInferMode, 'control'>

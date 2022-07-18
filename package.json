@@ -30,12 +30,14 @@
     "@angular/core": "^14.0.5",
     "@angular/forms": "^14.0.5",
     "@types/jest": "^28.1.4",
+    "gulp": "^4.0.2",
+    "gulp-header": "^2.0.9",
     "jest": "^28.1.2",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "build": "yarn tsc --build --verbose",
+    "build": "yarn tsc --build && yarn gulp",
     "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir ./ ./tests/*.test.ts",
     "pub": "yarn test && npm publish"
   }
