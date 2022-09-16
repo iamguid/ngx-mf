@@ -42,7 +42,7 @@ Then we define some magic type, like:
 Type Form = FormModel<IUserModel, { contacts: ['group'] }>
 ```
 
-Then we have type, based on our model, before form will be init:
+Then we have type, based on our model, before form will be define:
 
 ```typescript
 FormGroup<{
@@ -61,11 +61,12 @@ FormGroup<{
 
 > Q: Why i cannot just use `FormGroup<Model>` ?
 > 
-> A: see [/tests/pure-angular-forms.test.ts (example 1)](https://github.com/iamguid/ngx-mf/blob/master/tests/pure-angular-forms.test.ts)
+> A: Because when your model have nested fields,
+> then it wouldn't work
 
-> Q: Why i cannot define form as `FormGroup` ?
+> Q: Why i cannot define form just as `FormGroup` ?
 > 
-> A: Because you loose your types, see [/tests/type-lose.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/type-lose.ts)
+> A: Because then you loose your types
 
 > Q: Why i cannot define forms without binding
 > it to model type ?
@@ -77,12 +78,13 @@ FormGroup<{
 > 
 > A: Yes you can, it is another way to save form type
 > and you can use `typeof` to get type of form,
-> to pass it to the method, see [/tests/define-when-init.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/define-when-init.ts),
-> but when your model will change then you will see
-> errors only in the places where you use `patch`
-> or `setValue` or thomething like that,
+> to pass it to the method but when your model will
+> change then you will see errors only in the places
+> where you use `patch` > or `setValue` or thomething like that,
 > i think it is inderect errors, but when you bind
-> forms to models you see errors on the form definition
+> forms to models you see errors on the form definition.
+> But anyway in that case you can't to get types of your form before
+> it will be define
 
 > Q: What about dynamic forms ?
 > 
@@ -91,7 +93,7 @@ FormGroup<{
 > You can use `Replace` special type
 > to define what you want to infer (see Annotations chapter)
 > You can `Replace` inferred type to something like `FormGroup<any>`
-> and then cast it to your types.
+> and then cast it to your types if you really need it.
 
 > Q: What about complicated forms that includes many of
 > fields, groups and controls
@@ -101,7 +103,7 @@ FormGroup<{
 ## Restrictions
 
 * You cant use array syntax with `FormControlState`, but in other syntax
-(with constructor and FormBuilder) it works
+(with constructor and FormBuilder) it works fine
 
 ## Installation
 
@@ -234,10 +236,10 @@ infer in `FormControl`.
 By `InferModeOptional`, `InferModeRequired`, `InferModeFromModel`
 you can define nesting behavior of fields.
 
-* `InferModeNullable` - infer `FormControl<NonNullable<T> | null>`
+* `InferModeNullable` - infer `FormControl<T | null>`
 (by default)
-* `InferModeNonNullable` - infer `FormControl<NonNullable<T>`
-* `InferModeFromModel` - infer `FormControl<Exclude<T, undefined>>`
+* `InferModeNonNullable` - infer `FormControl<NonNullable<T>>`
+* `InferModeFromModel` - infer `FormControl<T>`
 and makes model optional fields as optional (`field?:`) in form type
 * `InferModeOptional` - makes all form fields optional
 * `InferModeRequired` - makes all form fields required
@@ -446,7 +448,7 @@ allow you not to specify controls types.
 constructor (`new FormGroup<Form['controls']>(...)`)
 syntax to define your forms.
 Because if you use array syntax, then you can't pass
-argument to FormGroup type and some features wont work.
+argument to FormGroup type.
 
 ## Links
 * Reddit topic - https://www.reddit.com/r/angular/comments/vv2xmd/what_do_you_think_about_generating_formgroup_type/

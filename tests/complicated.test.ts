@@ -34,7 +34,7 @@ describe('Complicated test', () => {
         expect(form.value.b![0].b).toBe('test');
     })
 
-    it('Build complicated form by two models', () => {
+    it('Build complicated form using two models', () => {
         interface Model1 {
             a: number
             b: number
