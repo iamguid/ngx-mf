@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormControl } from "@angular/forms";
-import { FormModel, InferModeNullable, Replace } from "../src";
+import { FormModel, InferModeNullable, InferModeRequired, Replace } from "../src";
 
 describe('Test FormModel annotations', () => {
     it('all primitives without annotations', () => {
@@ -15,11 +15,13 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, null, InferModeNullable> = fb.group({
-            a: [42],
-            b: [[1, 2, 3]],
-            c: [<Model['c']>{ d: 42 }],
-        })
+        type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control(42),
+            b: fb.control([1, 2, 3]),
+            c: fb.control({ d: 42 }),
+        });
 
         expect(form.value.a).toBe(42);
         expect(form.value.b).toStrictEqual([1, 2, 3]);
@@ -34,7 +36,11 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, null, InferModeNullable> = fb.array([42])
+        type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.control(42)
+        ]);
 
         expect(form.value[0]).toBe(42);
         expect(form.controls[0].value).toBe(42);
@@ -45,7 +51,11 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, 'array', InferModeNullable> = fb.array([42])
+        type Form = FormModel<Model, 'array', InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.control(42)
+        ]);
 
         expect(form.value[0]).toBe(42);
         expect(form.controls[0].value).toBe(42);
@@ -58,7 +68,11 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, null, InferModeNullable> = fb.group({ a: [42] })
+        type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({ 
+            a: fb.control(42) 
+        });
 
         expect(form.value.a).toBe(42);
         expect(form.controls.a.value).toBe(42);
@@ -71,7 +85,11 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, 'group', InferModeNullable> = fb.group({ a: [42] })
+        type Form = FormModel<Model, 'group', InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({ 
+            a: fb.control(42) 
+        });
 
         expect(form.value.a).toBe(42);
         expect(form.controls.a.value).toBe(42);
@@ -84,7 +102,11 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, 'control', InferModeNullable> = fb.control({ a: 42 })
+        type Form = FormModel<Model, 'control', InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.control({ 
+            a: 42 
+        });
 
         expect(form.value?.a).toBe(42);
     })
@@ -96,9 +118,11 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'control' }, InferModeNullable>;
+        type Form = FormModel<Model, { a: 'control' }, InferModeNullable & InferModeRequired>;
 
-        const form: Form = fb.group({ a: fb.control([42]) })
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control([42]) 
+        });
 
         expect(form.value?.a).toStrictEqual([42]);
     })
@@ -110,8 +134,12 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: 'array' }, InferModeNullable> = fb.group({
-            a: fb.array([42]),
+        type Form = FormModel<Model, { a: 'array' }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array<Form['controls']['a']['controls'][0]>([
+                fb.control(42)
+            ]),
         })
 
         expect(form.value.a![0]).toBe(42);
@@ -123,7 +151,13 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, ['group'], InferModeNullable> = fb.array([fb.group({ a: [42] })]);
+        type Form = FormModel<Model, ['group'], InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.group<Form['controls'][0]['controls']>({
+                a: fb.control(42)
+            })
+        ]);
 
         expect(form.value[0].a).toBe(42);
         expect(form.controls[0].controls.a.value).toBe(42);
@@ -134,7 +168,13 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, [['control']], InferModeNullable> = fb.array([fb.array([42])])
+        type Form = FormModel<Model, [['control']], InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.array<Form['controls'][0]['controls'][0]>([
+                fb.control(42)
+            ])
+        ]);
 
         expect(form.value[0][0]).toBe(42);
         expect(form.controls[0].controls[0].value).toBe(42);
@@ -147,11 +187,13 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: { b: 'control' } }, InferModeNullable> = fb.group({
-            a: fb.group({ 
-                b: [42]
+        type Form = FormModel<Model, { a: { b: 'control' } }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({ 
+                b: fb.control(42)
             }),
-        })
+        });
 
         expect(form.value.a?.b).toBe(42);
         expect(form.controls.a.controls.b.value).toBe(42);
@@ -162,11 +204,15 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, [[['control']]], InferModeNullable> = fb.array([
-            fb.array([
-                fb.array([42])
+        type Form = FormModel<Model, [[['control']]], InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.array<Form['controls'][0]['controls'][0]>([
+                fb.array<Form['controls'][0]['controls'][0]['controls'][0]>([
+                    fb.control(42)
+                ])
             ])
-        ])
+        ]);
 
         expect(form.value[0][0][0]).toBe(42);
         expect(form.controls[0].controls[0].controls[0].value).toBe(42);
@@ -179,9 +225,15 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: [['control']] }, InferModeNullable> = fb.group({
-            a: fb.array([fb.array([42])])
-        })
+        type Form = FormModel<Model, { a: [['control']] }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array<Form['controls']['a']['controls'][0]>([
+                fb.array<Form['controls']['a']['controls'][0]['controls'][0]>([
+                    fb.control(42)
+                ])
+            ])
+        });
 
         expect(form.value.a![0][0]).toBe(42);
         expect(form.controls.a.controls[0].controls[0].value).toBe(42);
@@ -196,13 +248,15 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: { b: 'array' } }, InferModeNullable> = fb.group({
-            a: fb.group({
-                b: fb.array([
+        type Form = FormModel<Model, { a: { b: 'array' } }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({
+                b: fb.array<Form['controls']['a']['controls']['b']['controls'][0]>([
                     fb.control(42)
                 ])
             })
-        })
+        });
 
         expect(form.value.a?.b![0]).toBe(42);
         expect(form.controls.a.controls.b.controls[0].value).toBe(42);
@@ -219,13 +273,15 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: { b: 'group' } }, InferModeNullable> = fb.group({
-            a: fb.group({
-                b: fb.group({
-                    c: [42]
+        type Form = FormModel<Model, { a: { b: 'group' } }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({
+                b: fb.group<Form['controls']['a']['controls']['b']['controls']>({
+                    c: fb.control(42)
                 })
             })
-        })
+        });
 
         expect(form.value.a?.b?.c).toBe(42);
         expect(form.controls.a.controls.b.controls.c.value).toBe(42);
@@ -242,15 +298,17 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, [{ a: { b: 'group' } }], InferModeNullable> = fb.array([
-            fb.group({
-                a: fb.group({
-                    b: fb.group({
-                        c: [42]
+        type Form = FormModel<Model, [{ a: { b: 'group' } }], InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.group<Form['controls'][0]['controls']>({
+                a: fb.group<Form['controls'][0]['controls']['a']['controls']>({
+                    b: fb.group<Form['controls'][0]['controls']['a']['controls']['b']['controls']>({
+                        c: fb.control(42)
                     })
                 })
             })
-        ])
+        ]);
 
         expect(form.value[0].a?.b?.c).toBe(42);
         expect(form.controls[0].controls.a.controls.b.controls.c.value).toBe(42);
@@ -263,10 +321,12 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, [['group']], InferModeNullable> = fb.array([
-            fb.array([
-                fb.group({
-                    a: [42]
+        type Form = FormModel<Model, [['group']], InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.array<Form['controls'][0]['controls'][0]>([
+                fb.group<Form['controls'][0]['controls'][0]['controls']>({
+                    a: fb.control(42)
                 })
             ])
         ])
@@ -282,9 +342,15 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: ['group'] }, InferModeNullable> = fb.group({
-            a: fb.array([ fb.group({ b: [42] }) ])
-        })
+        type Form = FormModel<Model, { a: ['group'] }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array<Form['controls']['a']['controls'][0]>([ 
+                fb.group<Form['controls']['a']['controls'][0]['controls']>({
+                    b: fb.control(42) 
+                }) 
+            ])
+        });
 
         expect(form.value.a![0].b).toBe(42);
         expect(form.controls.a.controls[0].controls.b.value).toBe(42);
@@ -295,11 +361,15 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, [{ a: 'array' }], InferModeNullable> = fb.array([
-            fb.group({
-                a: fb.array([42])
+        type Form = FormModel<Model, [{ a: 'array' }], InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.array<Form['controls'][0]>([
+            fb.group<Form['controls'][0]['controls']>({
+                a: fb.array<Form['controls'][0]['controls']['a']['controls'][0]>([
+                    fb.control(42)
+                ])
             })
-        ])
+        ]);
 
         expect(form.value[0].a![0]).toBe(42);
         expect(form.controls[0].controls.a.controls[0].value).toBe(42);
@@ -312,15 +382,17 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: [{ b: 'group' }] }, InferModeNullable> = fb.group({
-            a: fb.array([
-                fb.group({
-                    b: fb.group({
-                        c: [42]
+        type Form = FormModel<Model, { a: [{ b: 'group' }] }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.array<Form['controls']['a']['controls'][0]>([
+                fb.group<Form['controls']['a']['controls'][0]['controls']>({
+                    b: fb.group<Form['controls']['a']['controls'][0]['controls']['b']['controls']>({
+                        c: fb.control(42)
                     })
                 })
             ])
-        })
+        });
 
         expect(form.value.a![0].b?.c).toBe(42);
         expect(form.controls.a.controls[0].controls.b.controls.c.value).toBe(42);
@@ -339,17 +411,19 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<DeepGroup, { a: { b: [{ c: 'group' }] } }, InferModeNullable> = fb.group({
-            a: fb.group({
-                b: fb.array([
-                    fb.group({
-                        c: fb.group({
-                            d: [42]
+        type Form = FormModel<DeepGroup, { a: { b: [{ c: 'group' }] } }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({
+                b: fb.array<Form['controls']['a']['controls']['b']['controls'][0]>([
+                    fb.group<Form['controls']['a']['controls']['b']['controls'][0]['controls']>({
+                        c: fb.group<Form['controls']['a']['controls']['b']['controls'][0]['controls']['c']['controls']>({
+                            d: fb.control(42)
                         })
                     })
                 ])
             })
-        })
+        });
 
         expect(form.value.a?.b![0].c?.d).toBe(42);
         expect(form.controls.a?.controls.b.controls[0].controls.c.controls.d.value).toBe(42);
@@ -368,11 +442,13 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model1, { a: Replace<FormModel<Model2>> }, InferModeNullable> = fb.group({
-            a: fb.group({
-                c: ['test']
+        type Form = FormModel<Model1, { a: Replace<FormModel<Model2>> }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({
+                c: fb.control('test')
             })
-        })
+        });
 
         expect(form.value.a?.c).toBe('test');
         expect(form.controls.a.controls.c.value).toStrictEqual('test');
@@ -385,8 +461,10 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: Replace<FormControl<Date | null>> }, InferModeNullable> = fb.group({
-            a: [new Date('2022-07-11T18:27:19.583Z')],
+        type Form = FormModel<Model, { a: Replace<FormControl<Date | null>> }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control(new Date('2022-07-11T18:27:19.583Z')),
         })
 
         expect(form.value.a).toStrictEqual(new Date('2022-07-11T18:27:19.583Z'));
@@ -402,7 +480,9 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: Replace<FormControl<number | null>> }, InferModeNullable> = fb.group({
+        type Form = FormModel<Model, { a: Replace<FormControl<number | null>> }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
             a: fb.control(42),
         })
 

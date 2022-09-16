@@ -229,25 +229,26 @@ FormGroup<{
 }>
 ```
 
+Also you can check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
+
 ## Infer Modes
-`ngx-mf` have different InferMode-s: by `InferModeNullable`
-and `InferModeNonNullable` you can manage, what you want to
-infer in `FormControl`.
-By `InferModeOptional`, `InferModeRequired`, `InferModeFromModel`
-you can define nesting behavior of fields.
+`ngx-mf` have different InferMode-s.
 
-* `InferModeNullable` - infer `FormControl<T | null>`
-(by default)
-* `InferModeNonNullable` - infer `FormControl<NonNullable<T>>`
-* `InferModeFromModel` - infer `FormControl<T>`
-and makes model optional fields as optional (`field?:`) in form type
-* `InferModeOptional` - makes all form fields optional
-* `InferModeRequired` - makes all form fields required
+You can combine InferModes using type union.
 
-You can combine `InferModeOptional` and `InferModeRequired` with modes
-`InferModeNullable` and `InferModeNonNullable` using type union,
-for example `InferModeNullable & InferModeOptional` means that each
-field should be optional and every field will be nullable.
+Available variants:
+
+* `InferModeFromModel` - infer all from model (optionals and nullability)
+* `InferModeFromModel & InferModeNonNullable` - infer optionals from model, and all controls will be all nonnullable
+* `InferModeFromModel & InferModeNullable` - infer optionals from model, and all controls will be nullable 
+* `InferModeOptional & InferModeNonNullable` - makes all fields optional and all controls will be nonnullable
+* `InferModeOptional & InferModeNullable` - makes all fields optional, and all controls will be nnullable
+* `InferModeOptional & InferModeFromModel` - makes all fields optional, and controls infer nullability from model
+* `InferModeRequired & InferModeNonNullable` - makes all fields required, and all controls will be nonnullable
+* `InferModeRequired & InferModeNullable` - makes all fields required, and all controls will be nnullable
+* `InferModeRequired & InferModeFromModel` - makes all fields required, and controls infer nullability from model
+
+Also you can check [/tests/infermode.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/infermode.test.ts)
 
 ## Examples Of Usage
 

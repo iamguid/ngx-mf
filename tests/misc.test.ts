@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel, InferModeNonNullable, InferModeNullable, InferModeOptional } from "../src";
+import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field should be nonnullalbe', () => {
@@ -11,14 +11,14 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, null, InferModeNonNullable>;
+        type Form = FormModel<Model, null, InferModeFromModel & InferModeNonNullable>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42, { nonNullable: true })
         })
 
         expect(form.value.a).toBe(42);
-        expect(form.controls.a.value).toBe(42);
+        expect(form.controls.a?.value).toBe(42);
     })
 
     it('nested undefined nullable optional fields should be nonnullable', () => {
@@ -30,8 +30,8 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'group' }, InferModeNonNullable>;
-        type NestedForm = NonNullable<Form['controls']['a']['controls']>;
+        type Form = FormModel<Model, { a: 'group' }, InferModeFromModel & InferModeNonNullable>;
+        type NestedForm = NonNullable<NonNullable<Form['controls']['a']>['controls']>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<NestedForm>({
@@ -40,7 +40,7 @@ describe('Misc tests', () => {
         })
 
         expect(form.value.a?.b).toBe(42);
-        expect(form.controls.a.controls.b.value).toBe(42);
+        expect(form.controls.a?.controls.b?.value).toBe(42);
     })
 
     it('Date inside FormControl', () => {
@@ -50,7 +50,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, null, InferModeNonNullable> = fb.group({
+        type Form = FormModel<Model, null, InferModeFromModel & InferModeNonNullable>
+
+        const form: Form = fb.group<Form['controls']>({
             a: fb.control(new Date('2022-07-08T06:46:28.452Z'), { nonNullable: true })
         })
 
@@ -66,8 +68,10 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Omit<Model, 'a'>, null, InferModeNullable> = fb.group({
-            b: [42]
+        type Form = FormModel<Omit<Model, 'a'>, null, InferModeFromModel & InferModeNullable>;
+
+        const form: Form = fb.group<Form['controls']>({
+            b: fb.control(42)
         })
 
         expect(form.value.b).toBe(42);
@@ -81,7 +85,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, null, InferModeNonNullable>
+        type Form = FormModel<Model, null, InferModeFromModel & InferModeNonNullable>
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42, { nonNullable: true })
@@ -107,15 +111,17 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, { a: { b: 'group' }, d: { e: 'group' } }, InferModeNullable> = fb.group({
-            a: fb.group({
-                b: fb.group({
-                    c: [42]
+        type Form = FormModel<Model, { a: { b: 'group' }, d: { e: 'group' } }, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.group<Form['controls']['a']['controls']>({
+                b: fb.group<Form['controls']['a']['controls']['b']['controls']>({
+                    c: fb.control(42)
                 })
             }),
-            d: fb.group({
-                e: fb.group({
-                    f: [42]
+            d: fb.group<Form['controls']['d']['controls']>({
+                e: fb.group<Form['controls']['d']['controls']['e']['controls']>({
+                    f: fb.control(42)
                 })
             })
         })
@@ -131,9 +137,11 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model & { b: string }, null, InferModeNullable> = fb.group({
-            a: [42],
-            b: ['test'],
+        type Form = FormModel<Model & { b: string }, null, InferModeNullable & InferModeRequired>;
+
+        const form: Form = fb.group<Form['controls']>({
+            a: fb.control(42),
+            b: fb.control('test'),
         })
 
         expect(form.value.a).toBe(42);
@@ -207,7 +215,7 @@ describe('Misc tests', () => {
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
-                b: fb.control<Model2 | null>(null)
+                b: fb.control(null)
             })
         })
 
