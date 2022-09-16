@@ -100,7 +100,7 @@ describe('Test FormModel annotations', () => {
 
         const form: Form = fb.group({ a: fb.control([42]) })
 
-        expect(form.value?.a).toBe(42);
+        expect(form.value?.a).toStrictEqual([42]);
     })
 
     it('array inside group', () => {
