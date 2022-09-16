@@ -51,7 +51,7 @@ describe('Test FormModel annotations', () => {
         expect(form.controls[0].value).toBe(42);
     })
 
-    it('group', () => {
+    it('default group annotation', () => {
         interface Model {
             a: number;
         };
@@ -71,7 +71,7 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        const form: FormModel<Model, null, InferModeNullable> = fb.group({ a: [42] })
+        const form: FormModel<Model, 'group', InferModeNullable> = fb.group({ a: [42] })
 
         expect(form.value.a).toBe(42);
         expect(form.controls.a.value).toBe(42);
@@ -85,6 +85,20 @@ describe('Test FormModel annotations', () => {
         const fb = new FormBuilder();
 
         const form: FormModel<Model, 'control', InferModeNullable> = fb.control({ a: 42 })
+
+        expect(form.value?.a).toBe(42);
+    })
+
+    it('control string annotation on array', () => {
+        interface Model {
+            a: number[];
+        };
+
+        const fb = new FormBuilder();
+
+        type Form = FormModel<Model, { a: 'control' }, InferModeNullable>;
+
+        const form: Form = fb.group({ a: fb.control([42]) })
 
         expect(form.value?.a).toBe(42);
     })

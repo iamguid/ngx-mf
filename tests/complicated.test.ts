@@ -77,7 +77,7 @@ describe('Complicated test', () => {
         expect(form2.value.d).toBeUndefined();
     })
 
-    it('complex form with different annotations', () => {
+    it('Complex form with different annotations', () => {
         interface Model {
             a: number;
             b: string[];
