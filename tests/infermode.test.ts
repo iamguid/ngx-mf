@@ -49,7 +49,6 @@ describe('InferModeFromModel', () => {
         type FormArrayB = Form['controls']['b']['controls'][0]
 
         const form: Form = fb.group<Form['controls']>({
-            // TODO: Should be the same of b?
             a: fb.array<FormArrayA>([ fb.control(42, { nonNullable: true }) ]),
             b: fb.array<FormArrayB>([ fb.control(42), fb.control(null) ]),
         })
@@ -248,9 +247,7 @@ describe('InferModeOptional & InferModeNonNullable', () => {
             a: fb.control(42),
             b: fb.control(42),
 
-            // TODO: Bug `c` is nullable
             c: fb.control(42),
-            // TODO: Bug `d` is nullable
             d: fb.control(42),
         })
 
@@ -396,7 +393,6 @@ describe('InferModeRequired & InferModeNullable', () => {
         type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
 
         const form1: Form = fb.group<Form['controls']>({
-            // TODO: bug a is not nullable
             a: fb.control(42),
             b: fb.control(42)
         })
