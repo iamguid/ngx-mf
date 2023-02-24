@@ -1,6 +1,7 @@
 ### Misc ###
 # System Files
 .DS_Store/
+.DS_Store
 
 # IDEs and editors
 .idea/

@@ -1,6 +1,6 @@
 import "@angular/compiler";
 
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder } from "@angular/forms";
 import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
 
 describe('Misc tests', () => {
