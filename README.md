@@ -58,7 +58,7 @@ interface IUserModel {
 Then we define some magic type, like:
 
 ```typescript
-Type Form = FormModel<IUserModel, { contacts: ['group'] }>
+Type Form = FormModel<IUserModel, { contacts: [FormElementGroup] }>
 ```
 
 Then we have type, based on our model, before form will be define:
@@ -144,34 +144,34 @@ in our `FormModel` type. The syntax of annotation would
 be like that:
 
 ```typescript
-{ contacts: ['group'] }
+{ contacts: [FormElementGroup] }
 ```
 
-Where `contacts` is our field, `['group']` indicates that
-field is `FormArray`, `'group'` indicates that we have
+Where `contacts` is our field, `[FormElementGroup]` indicates that
+field is `FormArray`, `FormElementGroup` indicates that we have
 `FormGroup` inside `FormArray`.
 
 So our full `UserForm` type should be:
 ```typescript
-FormModel<Omit<IUserModel, 'id'>, { contacts: ['group'] }>
+FormModel<Omit<IUserModel, 'id'>, { contacts: [FormElementGroup] }>
 ```
 
 You can find full example
 here [/tests/example.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/example.test.ts)
 
 ## Annotations
-`ngx-mf` annotations have three different keywords: `array`,
-`group`, `control` and special type `Replace`
+`ngx-mf` annotations have three different keywords: `FormElementArray`,
+`FormElementGroup`, `FormElementControl` and special type `Replace`
 
-* `array` - infer `FormArray`
-* `group` - infer `FormGroup`
-* `control` - infer `FormControl`
+* `FormElementArray` - infer `FormArray`
+* `FormElementGroup` - infer `FormGroup`
+* `FormElementControl` - infer `FormControl`
 * `Replace<T>` - if you want replace inferred type to `T`
 
-Also annotations can be objects like `{a: 'group'}`,
-and arrays like `['group']`.
+Also annotations can be objects like `{a: FormElementGroup}`,
+and arrays like `[FormElementGroup]`.
 
-And you can combine `{}`, `[]`, `'array'`, `'group'`, `'control'`
+And you can combine `{}`, `[]`, `FormElementArray`, `FormElementGroup`, `FormElementControl`
 to specify what you want.
 
 If you use `{}` then object with the same nesting will be `FormGroup`
@@ -209,7 +209,7 @@ it is a case of InferMode.
 So we need define FormModel like this:
 
 ```typescript
-type Form = FormModel<IUserModel, { contacts: ['group'] }, InferModeOptional & InferModeNonNullable>;
+type Form = FormModel<IUserModel, { contacts: [FormElementGroup] }, InferModeOptional & InferModeNonNullable>;
 ```
 
 Then we have that type:
@@ -297,7 +297,7 @@ Now let's say that `b` should be `FormArray`
 > Define Form type:
 > 
 > ```typescript
-> type Form = FormModel<Model, { b: 'array' }>
+> type Form = FormModel<Model, { b: FormElementArray }>
 > ```
 
 > Inferred `Form` type
@@ -324,7 +324,7 @@ Now let's say that `c` should be `FormGroup`
 > Define Form type:
 > 
 > ```typescript
-> type Form = FormModel<Model, { c: 'group' }>
+> type Form = FormModel<Model, { c: FormElementGroup }>
 > ```
  
 > Inferred `Form` type
@@ -351,7 +351,7 @@ Now let's say that `c.f` should be `FormGroup`
 > Define Form type:
 > 
 > ```typescript
-> type Form = FormModel<Model, { c: { f: 'group' } }>
+> type Form = FormModel<Model, { c: { f: FormElementGroup } }>
 > ```
  
 > Inferred `Form` type
@@ -381,7 +381,7 @@ Now let's say that `c.d.e` should be `FormArray`
 > Define Form type:
 > 
 > ```typescript
-> type Form = FormModel<Model, { c: { d: { e: 'array' } } }>
+> type Form = FormModel<Model, { c: { d: { e: FormElementArray } } }>
 > ```
 
 > Inferred `Form` type
@@ -419,13 +419,13 @@ Now let's say that `c.d.e` should be `FormArray`
 > Also you can define FormArray recursively like group inside
 > array inside array :)
 > ```typescript
-> type Form = FormModel<SomeModel, [['group']]>
+> type Form = FormModel<SomeModel, [[FormElementGroup]]>
 > ```
 
 > Or array inside group inside array for example:
 > 
 > ```typescript
-> type Form = FormModel<SomeModel, [{a: 'array'}]>
+> type Form = FormModel<SomeModel, [{a: FormElementArray}]>
 > ```
 
 Other examples you can find in annotation tests
