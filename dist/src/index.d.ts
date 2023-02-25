@@ -1,11 +1,20 @@
 // @ts-nocheck 
 import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 declare type DefaultInferMode = InferModeNullable & InferModeRequired;
-declare type FormElementType = 'control' | 'group' | 'array';
 export declare type FormModel<TModel, TAnnotations extends TransformToAnnotations<TModel> | null = null, TInferMode extends InferMode = DefaultInferMode> = FormModelInnerTraverse<TModel, TAnnotations, TInferMode>;
 export declare type Replace<T extends AbstractControl> = T & {
     __replace__: '__replace__';
 };
+export declare type FormElementControl = {
+    __control__: '__control__';
+};
+export declare type FormElementGroup = {
+    __group__: '__group__';
+};
+export declare type FormElementArray = {
+    __array__: '__array__';
+};
+export declare type FormElementType = FormElementControl | FormElementGroup | FormElementArray;
 export declare type InferModeOptional = {
     __optional__: '__optional__';
 };
@@ -51,6 +60,6 @@ declare type ApplyInferMode<T, TInferMode extends InferMode> = TInferMode extend
 declare type FormModelInnerKeyofTraverse<TModel extends object, TAnnotations, TInferMode extends InferMode, TPreparedModel = PrepareModel<TModel, TInferMode>> = {
     [key in keyof TPreparedModel]: FormModelInnerTraverse<TModel[key], TAnnotations[key], TInferMode>;
 };
-declare type FormModelInnerTraverse<TModel, TAnnotations, TInferMode extends InferMode> = TAnnotations extends null ? TModel extends Array<any> ? FormModelInnerTraverse<TModel, 'array', TInferMode> : TModel extends object ? FormModelInnerTraverse<TModel, 'group', TInferMode> : FormModelInnerTraverse<TModel, 'control', TInferMode> : TAnnotations extends 'array' ? TModel extends Array<infer TInferredArrayValueType> ? FormArray<FormControl<ApplyInferMode<TInferredArrayValueType, TInferMode>>> : never : TAnnotations extends 'group' ? TModel extends object ? FormGroup<FormModelInnerKeyofTraverse<TModel, 'group', TInferMode>> : never : TAnnotations extends 'control' ? FormControl<ApplyInferMode<TModel, TInferMode>> : TAnnotations extends Replace<infer TInferredReplace> ? TInferredReplace : TAnnotations extends Array<infer TInferedAnnotations> ? TModel extends Array<infer TInferedArrayType> ? FormArray<FormModelInnerTraverse<TInferedArrayType, TInferedAnnotations, TInferMode>> : never : TAnnotations extends object ? TModel extends object ? FormGroup<FormModelInnerKeyofTraverse<TModel, TAnnotations, TInferMode>> : never : FormModelInnerTraverse<TModel, 'control', TInferMode>;
+declare type FormModelInnerTraverse<TModel, TAnnotations, TInferMode extends InferMode> = TAnnotations extends null ? TModel extends Array<any> ? FormModelInnerTraverse<TModel, FormElementArray, TInferMode> : TModel extends object ? FormModelInnerTraverse<TModel, FormElementGroup, TInferMode> : FormModelInnerTraverse<TModel, FormElementArray, TInferMode> : TAnnotations extends FormElementArray ? TModel extends Array<infer TInferredArrayValueType> ? FormArray<FormControl<ApplyInferMode<TInferredArrayValueType, TInferMode>>> : never : TAnnotations extends FormElementGroup ? TModel extends object ? FormGroup<FormModelInnerKeyofTraverse<TModel, FormElementGroup, TInferMode>> : never : TAnnotations extends FormElementControl ? FormControl<ApplyInferMode<TModel, TInferMode>> : TAnnotations extends Replace<infer TInferredReplace> ? TInferredReplace : TAnnotations extends Array<infer TInferedAnnotations> ? TModel extends Array<infer TInferedArrayType> ? FormArray<FormModelInnerTraverse<TInferedArrayType, TInferedAnnotations, TInferMode>> : never : TAnnotations extends object ? TModel extends object ? FormGroup<FormModelInnerKeyofTraverse<TModel, TAnnotations, TInferMode>> : never : FormModelInnerTraverse<TModel, FormElementControl, TInferMode>;
 export {};
 //# sourceMappingURL=index.d.ts.map

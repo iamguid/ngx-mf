@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder } from "@angular/forms";
-import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
+import { FormElementControl, FormElementGroup, FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field should be nonnullalbe', () => {
@@ -30,7 +30,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'group' }, InferModeFromModel & InferModeNonNullable>;
+        type Form = FormModel<Model, { a: FormElementGroup }, InferModeFromModel & InferModeNonNullable>;
         type NestedForm = NonNullable<NonNullable<Form['controls']['a']>['controls']>;
 
         const form: Form = fb.group<Form['controls']>({
@@ -111,7 +111,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: { b: 'group' }, d: { e: 'group' } }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: { b: FormElementGroup }, d: { e: FormElementGroup } }, InferModeNullable & InferModeRequired>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -160,7 +160,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'group' }, InferModeNullable & InferModeOptional>
+        type Form = FormModel<Model, { a: FormElementGroup }, InferModeNullable & InferModeOptional>
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<NonNullable<Form['controls']['a']>['controls']>({
@@ -183,7 +183,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, 'group', InferModeNullable & InferModeOptional>
+        type Form = FormModel<Model, FormElementGroup, InferModeNullable & InferModeOptional>
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control({
@@ -211,7 +211,7 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: { b: 'control' } }>;
+        type Form = FormModel<Model, { a: { b: FormElementControl } }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -221,5 +221,22 @@ describe('Misc tests', () => {
 
         expect(form.value.a?.b).toBeNull();
         expect(form.controls.a.controls.b.value).toBeNull();
+    })
+
+    it('Link property https://github.com/iamguid/ngx-mf/issues/5', () => {
+        interface Working {
+            name: string;
+          }
+          interface Broken {
+            link: string;
+          }
+      
+          type WorkingForm = FormModel<Working>;
+          type BrokenForm = FormModel<Broken>;
+
+        const fb = new FormBuilder();
+      
+          const wf = fb.group<WorkingForm['controls']>({name: fb.control('Name')});
+          const bf = fb.group<BrokenForm['controls']>({link: fb.control('Link')}); 
     })
 })

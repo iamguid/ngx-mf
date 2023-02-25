@@ -3,9 +3,6 @@ import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/for
 // Default infer mode 
 type DefaultInferMode = InferModeNullable & InferModeRequired
 
-// Form element types for annotations
-type FormElementType = 'control' | 'group' | 'array';
-
 // Main type
 export type FormModel<
   TModel,
@@ -15,6 +12,13 @@ export type FormModel<
 
 // Special type for annotation
 export type Replace<T extends AbstractControl> = T & { __replace__: '__replace__' };
+
+// Variants of form elements types
+// Variants of infer modes
+export type FormElementControl = { __control__: '__control__' }
+export type FormElementGroup = { __group__: '__group__' }
+export type FormElementArray = { __array__: '__array__' }
+export type FormElementType = FormElementControl | FormElementGroup | FormElementArray
 
 // Variants of infer modes
 export type InferModeOptional = { __optional__: '__optional__' }
@@ -116,17 +120,17 @@ type FormModelInnerTraverse<
   // When annotations is not set
   TAnnotations extends null
   ? TModel extends Array<any>
-    ? FormModelInnerTraverse<TModel, 'array', TInferMode>
+    ? FormModelInnerTraverse<TModel, FormElementArray, TInferMode>
     : TModel extends object
-      ? FormModelInnerTraverse<TModel, 'group', TInferMode>
-      : FormModelInnerTraverse<TModel, 'control', TInferMode>
+      ? FormModelInnerTraverse<TModel, FormElementGroup, TInferMode>
+      : FormModelInnerTraverse<TModel, FormElementArray, TInferMode>
 
   // FormArray string annotation
   //
   // If we have 'array' string in annotation 
   // and current object is array type 
   // then infer FormArray type recursively
-  : TAnnotations extends 'array'
+  : TAnnotations extends FormElementArray
     ? TModel extends Array<infer TInferredArrayValueType>
       ? FormArray<FormControl<ApplyInferMode<TInferredArrayValueType, TInferMode>>>
       : never
@@ -136,16 +140,16 @@ type FormModelInnerTraverse<
   // If we have 'group' string in annotation
   // and current object is record type
   // then infer FormGroup type recursively
-  : TAnnotations extends 'group'
+  : TAnnotations extends FormElementGroup
     ? TModel extends object
-      ? FormGroup<FormModelInnerKeyofTraverse<TModel, 'group', TInferMode>>
+      ? FormGroup<FormModelInnerKeyofTraverse<TModel, FormElementGroup, TInferMode>>
       : never
 
   // FormControl string annotation
   //
   // If we have 'control' string in annotation
   // then infer FormControl type
-  : TAnnotations extends 'control'
+  : TAnnotations extends FormElementControl
     ? FormControl<ApplyInferMode<TModel, TInferMode>>
 
   // Replace annotation
@@ -175,4 +179,4 @@ type FormModelInnerTraverse<
       ? FormGroup<FormModelInnerKeyofTraverse<TModel, TAnnotations, TInferMode>>
       : never
 
-  : FormModelInnerTraverse<TModel, 'control', TInferMode>
+  : FormModelInnerTraverse<TModel, FormElementControl, TInferMode>

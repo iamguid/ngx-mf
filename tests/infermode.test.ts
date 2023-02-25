@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder } from "@angular/forms"
-import { FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
+import { FormElementArray, FormElementGroup, FormModel, InferModeFromModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
 
 describe('InferModeFromModel', () => {
     it('flat object', () => {
@@ -44,7 +44,7 @@ describe('InferModeFromModel', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'array', b: 'array' }, InferModeFromModel>
+        type Form = FormModel<Model, { a: FormElementArray, b: FormElementArray }, InferModeFromModel>
         type FormArrayA = Form['controls']['a']['controls'][0]
         type FormArrayB = Form['controls']['b']['controls'][0]
 
@@ -71,7 +71,7 @@ describe('InferModeFromModel', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'group' }, InferModeFromModel>;
+        type Form = FormModel<Model, { a: FormElementGroup }, InferModeFromModel>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<NonNullable<Form['controls']['a']>['controls']>({
@@ -118,8 +118,8 @@ describe('InferModeFromModel & InferModeNonNullable', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: 'group' }, InferModeFromModel & InferModeNonNullable>;
-        type NestedForm = FormModel<Model['a'], 'group', InferModeFromModel & InferModeNonNullable>
+        type Form = FormModel<Model, { a: FormElementGroup }, InferModeFromModel & InferModeNonNullable>;
+        type NestedForm = FormModel<Model['a'], FormElementGroup, InferModeFromModel & InferModeNonNullable>
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<NestedForm['controls']>({
@@ -139,7 +139,7 @@ describe('InferModeFromModel & InferModeNonNullable', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: 'array', b: 'array' }, InferModeFromModel & InferModeNonNullable>
+        type Form = FormModel<Model, { a: FormElementArray, b: FormElementArray }, InferModeFromModel & InferModeNonNullable>
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.array([ fb.control(42) ]),
@@ -185,7 +185,7 @@ describe('InferModeFromModel & InferModeNullable', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'group' }, InferModeFromModel & InferModeNullable>;
+        type Form = FormModel<Model, { a: FormElementGroup }, InferModeFromModel & InferModeNullable>;
         type NestedForm = Form['controls']['a']
 
         const form: Form = fb.group<Form['controls']>({
@@ -209,7 +209,7 @@ describe('InferModeFromModel & InferModeNullable', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, { a: 'array', b: 'array' }, InferModeFromModel & InferModeNullable>
+        type Form = FormModel<Model, { a: FormElementArray, b: FormElementArray }, InferModeFromModel & InferModeNullable>
         type FormArrayA = Form['controls']['a']['controls'][0]
         type FormArrayB = Form['controls']['b']['controls'][0]
 
