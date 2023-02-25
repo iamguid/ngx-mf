@@ -16,13 +16,13 @@ Because in future TypeScript releases library may break down
 npm
 
 ```bash
-$ npm i ngx-mf --saveDev
+$ npm i ngx-mf
 ```
 
 yarn
 
 ```bash
-$ yarn add ngx-mf --dev
+$ yarn add ngx-mf
 ```
 
 ## Restrictions
