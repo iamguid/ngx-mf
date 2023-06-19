@@ -37,6 +37,9 @@
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"
   },
+  "peerDependencies": {
+    "@angular/forms": ">=14.0.0"
+  },
   "scripts": {
     "build": "yarn gulp clean && yarn tsc --build && yarn gulp addTsNoCheckHeader",
     "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir ./ ./tests/*.test.ts",
