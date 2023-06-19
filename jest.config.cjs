@@ -7,6 +7,7 @@ module.exports = {
       useESM: true,
     },
   },
+  testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.[jt]sx?$',
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },

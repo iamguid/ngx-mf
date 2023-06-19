@@ -34,6 +34,7 @@
     "gulp": "^4.0.2",
     "gulp-header": "^2.0.9",
     "jest": "^28.1.2",
+    "rxjs": "^7.8.1",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4"
   },
@@ -42,7 +43,7 @@
   },
   "scripts": {
     "build": "yarn gulp clean && yarn tsc --build && yarn gulp addTsNoCheckHeader",
-    "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir ./ ./tests/*.test.ts",
+    "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir tests",
     "pub": "yarn test && npm publish"
   }
 }
