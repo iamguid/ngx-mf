@@ -56,7 +56,7 @@ declare type PrepareModel<T extends object, TInferMode extends InferMode> = TInf
 } : never : InferModeFromModel extends TInferMode ? {
     [key in keyof T]: T[key];
 } : never;
-declare type ApplyInferMode<T, TInferMode extends InferMode> = TInferMode extends InferModeNullable ? T | null : TInferMode extends InferModeNonNullable ? NonNullable<T> : T;
+declare type ApplyInferMode<T, TInferMode extends InferMode> = TInferMode extends InferModeNullable ? T | null : TInferMode extends InferModeNonNullable ? Exclude<T, null> : T;
 declare type FormModelInnerKeyofTraverse<TModel extends object, TAnnotations, TInferMode extends InferMode, TPreparedModel = PrepareModel<TModel, TInferMode>> = {
     [key in keyof TPreparedModel]: FormModelInnerTraverse<TModel[key], TAnnotations[key], TInferMode>;
 };
