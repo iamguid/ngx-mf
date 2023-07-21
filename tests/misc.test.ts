@@ -226,17 +226,40 @@ describe('Misc tests', () => {
     it('Link property https://github.com/iamguid/ngx-mf/issues/5', () => {
         interface Working {
             name: string;
-          }
-          interface Broken {
+        }
+
+        interface Broken {
             link: string;
-          }
-      
-          type WorkingForm = FormModel<Working>;
-          type BrokenForm = FormModel<Broken>;
+        }
+    
+        type WorkingForm = FormModel<Working>;
+        type BrokenForm = FormModel<Broken>;
 
         const fb = new FormBuilder();
       
-          const wf = fb.group<WorkingForm['controls']>({name: fb.control('Name')});
-          const bf = fb.group<BrokenForm['controls']>({link: fb.control('Link')}); 
+        const wf = fb.group<WorkingForm['controls']>({name: fb.control('Name')});
+        const bf = fb.group<BrokenForm['controls']>({link: fb.control('Link')}); 
+    })
+
+    it('Undefined value and optional property https://github.com/iamguid/ngx-mf/issues/4', () => {
+        interface Optional {
+            optionalA?: number;
+            optionalB?: number;
+            optionalC: number | undefined;
+            optionalD?: number | undefined;
+            optionalE?: number | undefined;
+        }
+    
+        type OptionalForm = FormModel<Optional, null, InferModeFromModel & InferModeNonNullable>;
+
+        const fb = new FormBuilder().nonNullable;
+      
+        const wf = fb.group<OptionalForm['controls']>({
+            // optionalA - when field is optinal, control should be optional
+            optionalB: fb.control(123), // when field is optinal, control should be optional
+            optionalC: fb.control(undefined), // when undefined on value, control value should be undefinable too
+            optionalD: fb.control(undefined), // when undefined on value and field is optional, control value should be undefinable too
+            // optionalE - when undefined on value and field is optional, control should be optional
+        });
     })
 })

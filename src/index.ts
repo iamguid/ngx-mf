@@ -94,10 +94,10 @@ type PrepareModel<T extends object, TInferMode extends InferMode> =
 
 type ApplyInferMode<T, TInferMode extends InferMode> =
   TInferMode extends InferModeNullable   
-    ? NonNullable<T> | null
+    ? T | null
     : TInferMode extends InferModeNonNullable  
-      ? NonNullable<T>
-      : Exclude<T, undefined>
+      ? Exclude<T, null>
+      : T
 
 // Traverse every key in object and transform it to form element recursively
 type FormModelInnerKeyofTraverse<
