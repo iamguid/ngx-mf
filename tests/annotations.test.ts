@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormControl } from "@angular/forms";
-import { FormElementArray, FormElementControl, FormElementGroup, FormModel, InferModeNullable, InferModeRequired, Replace } from "../src";
+import { FormElementArray, FormElementControl, FormElementGroup, FormModel, Replace } from "../src";
 
 describe('Test FormModel annotations', () => {
     it('all primitives without annotations', () => {
@@ -15,12 +15,12 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model>;
 
         const form: Form = fb.group<Form['controls']>({
-            a: fb.control(42),
-            b: fb.control([1, 2, 3]),
-            c: fb.control({ d: 42 }),
+            a: fb.nonNullable.control(42),
+            b: fb.nonNullable.control([1, 2, 3]),
+            c: fb.nonNullable.control({ d: 42 }),
         });
 
         expect(form.value.a).toBe(42);
@@ -36,22 +36,22 @@ describe('Test FormModel annotations', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model>;
 
         const form: Form = fb.array<Form['controls'][0]>([
-            fb.control(42)
+            fb.nonNullable.control(42)
         ]);
 
         expect(form.value[0]).toBe(42);
         expect(form.controls[0].value).toBe(42);
     })
 
-    it('array string annotation', () => {
+    it('array annotation', () => {
         type Model = number[];
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, FormElementArray, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, FormElementArray>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.control(42)
@@ -66,9 +66,9 @@ describe('Test FormModel annotations', () => {
             a: number;
         };
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, null, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42)
@@ -83,9 +83,9 @@ describe('Test FormModel annotations', () => {
             a: number;
         };
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, FormElementGroup, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, FormElementGroup>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42)
@@ -100,9 +100,9 @@ describe('Test FormModel annotations', () => {
             a: number;
         };
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, FormElementControl, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, FormElementControl>;
 
         const form: Form = fb.control({
             a: 42
@@ -116,9 +116,9 @@ describe('Test FormModel annotations', () => {
             a: number[];
         };
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: FormElementControl }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: FormElementControl }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control([42])
@@ -132,9 +132,9 @@ describe('Test FormModel annotations', () => {
             a: number[];
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: FormElementArray }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: FormElementArray }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.array<Form['controls']['a']['controls'][0]>([
@@ -149,9 +149,9 @@ describe('Test FormModel annotations', () => {
     it('group inside array', () => {
         type Model = { a: number }[];
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, [FormElementGroup], InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, [FormElementGroup]>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.group<Form['controls'][0]['controls']>({
@@ -166,9 +166,9 @@ describe('Test FormModel annotations', () => {
     it('array inside array', () => {
         type Model = number[][];
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, [[FormElementControl]], InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, [[FormElementControl]]>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.array<Form['controls'][0]['controls'][0]>([
@@ -185,9 +185,9 @@ describe('Test FormModel annotations', () => {
             a: { b: number; };
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: { b: FormElementControl } }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: { b: FormElementControl } }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -202,9 +202,9 @@ describe('Test FormModel annotations', () => {
     it('array inside array inside array', () => {
         type Model = number[][][];
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, [[[FormElementControl]]], InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, [[[FormElementControl]]]>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.array<Form['controls'][0]['controls'][0]>([
@@ -223,9 +223,9 @@ describe('Test FormModel annotations', () => {
             a: Array<Array<number>>;
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: [[FormElementControl]] }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: [[FormElementControl]] }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.array<Form['controls']['a']['controls'][0]>([
@@ -246,9 +246,9 @@ describe('Test FormModel annotations', () => {
             }
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: { b: FormElementArray } }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: { b: FormElementArray } }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -271,9 +271,9 @@ describe('Test FormModel annotations', () => {
             }
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: { b: FormElementGroup } }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: { b: FormElementGroup } }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -296,9 +296,9 @@ describe('Test FormModel annotations', () => {
             }
         }[]
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, [{ a: { b: FormElementGroup } }], InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, [{ a: { b: FormElementGroup } }]>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.group<Form['controls'][0]['controls']>({
@@ -319,9 +319,9 @@ describe('Test FormModel annotations', () => {
             a: number;
         }[][]
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, [[FormElementGroup]], InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, [[FormElementGroup]]>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.array<Form['controls'][0]['controls'][0]>([
@@ -340,9 +340,9 @@ describe('Test FormModel annotations', () => {
             a: Array<{ b: number }>;
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: [FormElementGroup] }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: [FormElementGroup] }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.array<Form['controls']['a']['controls'][0]>([
@@ -359,9 +359,9 @@ describe('Test FormModel annotations', () => {
     it('array inside group inside array', () => {
         type Model = Array<{ a: number[] }>
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, [{ a: FormElementArray }], InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, [{ a: FormElementArray }]>;
 
         const form: Form = fb.array<Form['controls'][0]>([
             fb.group<Form['controls'][0]['controls']>({
@@ -380,9 +380,9 @@ describe('Test FormModel annotations', () => {
             a: Array<{ b: { c: number } }>
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: [{ b: FormElementGroup }] }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: [{ b: FormElementGroup }] }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.array<Form['controls']['a']['controls'][0]>([
@@ -409,9 +409,9 @@ describe('Test FormModel annotations', () => {
             }
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<DeepGroup, { a: { b: [{ c: FormElementGroup }] } }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<DeepGroup, { a: { b: [{ c: FormElementGroup }] } }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -426,7 +426,7 @@ describe('Test FormModel annotations', () => {
         });
 
         expect(form.value.a?.b![0].c?.d).toBe(42);
-        expect(form.controls.a?.controls.b.controls[0].controls.c.controls.d.value).toBe(42);
+        expect(form.controls.a.controls.b.controls[0].controls.c.controls.d.value).toBe(42);
     })
 
     it('Replace: change output type to another FormModel', () => {
@@ -440,9 +440,9 @@ describe('Test FormModel annotations', () => {
             c: string;
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model1, { a: Replace<FormModel<Model2>> }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model1, { a: Replace<FormModel<Model2>> }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.group<Form['controls']['a']['controls']>({
@@ -459,9 +459,9 @@ describe('Test FormModel annotations', () => {
             a: string;
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: Replace<FormControl<Date | null>> }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: Replace<FormControl<Date | null>> }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(new Date('2022-07-11T18:27:19.583Z')),
@@ -478,9 +478,9 @@ describe('Test FormModel annotations', () => {
             };
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: Replace<FormControl<number | null>> }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model, { a: Replace<FormControl<number | null>> }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42),

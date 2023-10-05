@@ -3,7 +3,7 @@
 // Usefull when you need to omit some fields from nested models
 
 import { FormBuilder } from "@angular/forms";
-import { FormElementGroup, FormModel, InferModeNullable, InferModeRequired } from "../src";
+import { FormElementGroup, FormModel } from "../src";
 
 interface ModelA {
     id: number;
@@ -31,9 +31,9 @@ type FormModelC = Omit<ModelC, 'modelA' | 'modelB'> & {
     modelB: FormModelB;
 }
 
-type FullForm = FormModel<FormModelC, { modelA: FormElementGroup, modelB: FormElementGroup }, InferModeRequired & InferModeNullable>;
+type FullForm = FormModel<FormModelC, { modelA: FormElementGroup, modelB: FormElementGroup }>;
 
-const fb = new FormBuilder();
+const fb = new FormBuilder().nonNullable;
 
 // Now we have form without id
 const form: FullForm = fb.group<FullForm['controls']>({

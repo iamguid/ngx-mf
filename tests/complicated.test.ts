@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormElementArray, FormElementGroup, FormModel, InferModeNonNullable, InferModeNullable, InferModeOptional, InferModeRequired } from "../src";
+import { FormElementArray, FormElementGroup, FormModel } from "../src";
 
 describe('Complicated test', () => {
     it('Two models', () => {
@@ -17,12 +17,12 @@ describe('Complicated test', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model1, { b: [FormElementGroup] }, InferModeNullable & InferModeRequired>;
+        type Form = FormModel<Model1, { b: [FormElementGroup] }>;
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42),
-            b: fb.array<Form['controls']['b']['controls'][0]>([
-                fb.group<Form['controls']['b']['controls'][0]['controls']>({
+            b: fb.array<NonNullable<Form['controls']['b']>['controls'][0]>([
+                fb.group<NonNullable<Form['controls']['b']>['controls'][0]['controls']>({
                     a: fb.control('test'),
                     b: fb.control('test')
                 })
@@ -42,20 +42,20 @@ describe('Complicated test', () => {
 
         interface Model2 {
             c: number
-            d: number
+            d: number | null
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Model1FormPart = FormModel<Model1, null, InferModeNonNullable & InferModeRequired>;
-        type Model2FormPart = FormModel<Model2, null, InferModeNullable & InferModeOptional>;
+        type Model1FormPart = FormModel<Model1, null>;
+        type Model2FormPart = FormModel<Model2, null>;
 
         type Form = FormGroup<Model1FormPart['controls'] & Model2FormPart['controls']>;
 
         // With c and d
         const form1: Form = fb.group<Form['controls']>({
-            a: fb.control(42, { nonNullable: true }),
-            b: fb.control(42, { nonNullable: true }),
+            a: fb.control(42),
+            b: fb.control(42),
             c: fb.control(42),
             d: fb.control(null),
         })
@@ -64,17 +64,6 @@ describe('Complicated test', () => {
         expect(form1.value.b).toBe(42);
         expect(form1.value.c).toBe(42);
         expect(form1.value.d).toBe(null);
-
-        // Without c and d
-        const form2: Form = fb.group<Form['controls']>({
-            a: fb.control(42, { nonNullable: true }),
-            b: fb.control(42, { nonNullable: true }),
-        })
-
-        expect(form2.value.a).toBe(42);
-        expect(form2.value.b).toBe(42);
-        expect(form2.value.c).toBeUndefined();
-        expect(form2.value.d).toBeUndefined();
     })
 
     it('Complex form with different annotations', () => {
@@ -91,9 +80,9 @@ describe('Complicated test', () => {
             }
         }
 
-        const fb = new FormBuilder();
+        const fb = new FormBuilder().nonNullable;
 
-        type Form1 = FormModel<Model, null, InferModeNullable & InferModeRequired>
+        type Form1 = FormModel<Model>
 
         const form1: Form1 = fb.group<Form1['controls']>({
             a: fb.control(42),
@@ -124,7 +113,7 @@ describe('Complicated test', () => {
             },
         });
 
-        type Form2 = FormModel<Model, { b: FormElementArray }, InferModeNullable & InferModeRequired>;
+        type Form2 = FormModel<Model, { b: FormElementArray }>;
 
         const form2: Form2 = fb.group<Form2['controls']>({
             a: fb.control(42),
@@ -157,7 +146,7 @@ describe('Complicated test', () => {
             },
         });
 
-        type Form3 = FormModel<Model, { c: FormElementGroup }, InferModeNullable & InferModeRequired>;
+        type Form3 = FormModel<Model, { c: FormElementGroup }>;
 
         const form3: Form3 = fb.group<Form3['controls']>({
             a: fb.control(42),
@@ -182,8 +171,8 @@ describe('Complicated test', () => {
         expect(form3.controls.c.controls.d.value).toStrictEqual({ e: [43], });
         expect(form3.controls.c.controls.f.value).toStrictEqual({ g: 'test' });
 
-        type Form4 = FormModel<Model, { c: { f: FormElementGroup } }, InferModeNullable & InferModeRequired>;
-                    
+        type Form4 = FormModel<Model, { c: { f: FormElementGroup } }>;
+
         const form4: Form4 = fb.group<Form4['controls']>({
             a: fb.control(42),
             b: fb.control(['test']),
@@ -207,7 +196,7 @@ describe('Complicated test', () => {
         expect(form4.controls.c.controls.d.value).toStrictEqual({ e: [43] });
         expect(form4.controls.c.controls.f.controls.g.value).toBe('test');
 
-        type Form5 = FormModel<Model, { c: { d: { e: FormElementArray } } }, InferModeNullable & InferModeRequired>;
+        type Form5 = FormModel<Model, { c: { d: { e: FormElementArray } } }>;
 
         const form5: Form5 = fb.group<Form5['controls']>({
             a: fb.control(42),
@@ -240,7 +229,7 @@ describe('Complicated test', () => {
                 d: FormElementGroup,
                 f: FormElementGroup,
             },
-        }, InferModeNullable & InferModeRequired>
+        }>
 
         const form6: Form6 = fb.group<Form6['controls']>({
             a: fb.control(42),

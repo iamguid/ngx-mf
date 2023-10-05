@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, Validators } from "@angular/forms"
-import { FormElementGroup, FormModel, InferModeNullable, InferModeRequired } from "../src"
+import { FormElementGroup, FormModel } from "../src"
 
 describe('Examples', () => {
     it('User form example', () => {
@@ -26,14 +26,14 @@ describe('Examples', () => {
 
         const fb = new FormBuilder();
 
-        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: [ FormElementGroup ] }, InferModeNullable & InferModeRequired>;
+        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: [ FormElementGroup ] }>;
         type ContactForm = UserForm['controls']['contacts']['controls'][0];
 
         const form: UserForm = fb.group<UserForm['controls']>({
-            firstName: fb.control(null),
-            lastName: fb.control(null),
-            nickname: fb.control(null),
-            birthday: fb.control(null),
+            firstName: fb.nonNullable.control('test'),
+            lastName: fb.nonNullable.control('test'),
+            nickname: fb.nonNullable.control('test'),
+            birthday: fb.nonNullable.control(13),
             contacts: fb.array<ContactForm>([]),
         });
 
@@ -49,13 +49,15 @@ describe('Examples', () => {
         }
 
         form.controls.contacts.controls.push(fb.group<ContactForm['controls']>({
-            type: fb.control(ContactType.Email),
-            contact: fb.control(null, Validators.email),
+            type: fb.nonNullable.control(ContactType.Email),
+            contact: fb.nonNullable.control('test@test.com', Validators.email),
         }));
 
         form.patchValue(value);
 
         expect(form.valid).toBeTruthy()
         expect(form.value.contacts![0].contact).toBe('iam.guid@gmail.com');
+
+        const testValue: IUserModel = form.value as IUserModel;
     })
 })

@@ -3,7 +3,7 @@
 // Useful when you need any
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormModel, InferModeNullable, InferModeRequired, Replace } from "../src";
+import { FormModel, Replace } from "../src";
 
 interface ModelA {
     a: number;
@@ -18,12 +18,12 @@ interface ModelC {
 }
 
 // You should use Replace
-type Form = FormModel<ModelC, { field: Replace<FormGroup<any>> }, InferModeNullable & InferModeRequired>;
+type Form = FormModel<ModelC, { field: Replace<FormGroup<any>> }>;
 
-type FormModelA = FormModel<ModelA, null, InferModeNullable & InferModeRequired>;
-type FormModelB = FormModel<ModelB, null, InferModeNullable & InferModeRequired>;
+type FormModelA = FormModel<ModelA>;
+type FormModelB = FormModel<ModelB>;
 
-const fb = new FormBuilder();
+const fb = new FormBuilder().nonNullable;
 
 // ModelA
 const form1: Form = new FormGroup<Form['controls']>({

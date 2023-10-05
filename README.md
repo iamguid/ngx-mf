@@ -1,15 +1,10 @@
 # ngx-mf
-`ngx-mf` is a small zero dependency set of TypeScript types for recursive
+`ngx-mf` is a small (100 lines of code) zero dependency set of TypeScript types for recursive
 infer angular `FormGroup`, `FormArray` or `FormControl` type
 from model type.
 
 It doesn't increase your bundle size because it's just
 TypeScript types.
-
-WARNING: I found some issues in TypeScript,
-for workaround it I use @ts-ignore,
-if it critical for your project don't use that library.
-Because in future TypeScript releases library may break down
 
 ## Installation
 
@@ -80,14 +75,13 @@ FormGroup<{
 
 `ngx-mf` exports type `FormModel`
 
-`FormModel<TModel, TAnnotations, TInferMode>` - This is the type
+`FormModel<TModel, TAnnotations>` - This is the type
 that recursively turns `TModel` fields (where `TModel` is your model type)
 into a `FormGroup`, `FormArray` or `FormControl`.
 You can choose what you want: `FormGroup`, `FormArray` or `FormControl`
 by annotations.
 You can pass `TAnnotations` as the second argument to specify
 output type using special syntax.
-Also you can pass `TInferType` for manage infer logic, see Infer Mode chapter.
 
 For example we have some model from How It Works chapter:
 
@@ -118,16 +112,13 @@ should be `FormControl` and field `contacts` should be
 `FormArray` of `FormGroups`.
 
 First of all we need to exclude `id` from our model,
-it is needed because all fields are required by default.
+it is needed because all fields are required.
 If we need to exclude some fields we
 should omit or pick them from source model.
 
 ```typescript
 Omit<IUserModel, 'id'>
 ```
-
-Ofcourse you can save optional fields in output type,
-see chapter Infer Mode
 
 If we want to add some field then we should using `&`
 operator or extends interface, for examle:
@@ -198,49 +189,6 @@ FormGroup<{
 ```
 
 Also you can check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
-
-## Infer Modes
-`ngx-mf` have different InferMode-s and it's a third type parameter of `FormModel`,
-InferMode needed for manage what you want to infer.
-For example we need make all fields in form optional,
-but we want that all controls should be nonnullable,
-it is a case of InferMode.
-
-So we need define FormModel like this:
-
-```typescript
-type Form = FormModel<IUserModel, { contacts: [FormElementGroup] }, InferModeOptional & InferModeNonNullable>;
-```
-
-Then we have that type:
-
-```typescript
-FormGroup<{
-    firstName?: FormControl<string>;
-    lastName?: FormControl<string>;
-    nickname?: FormControl<string>;
-    birthday?: FormControl<Date>;
-    contacts?: FormArray<FormGroup<{
-        type?: FormControl<ContactType>;
-        contact?: FormControl<string>;
-    }>>;
-}>
-```
-
-As we see now FormGroups has optional fields and all FormControls is nonnullable
-
-Available variants:
-* `InferModeFromModel` - infer all from model (optionals and nullability)
-* `InferModeFromModel & InferModeNonNullable` - infer optionals from model, and all controls will be all nonnullable
-* `InferModeFromModel & InferModeNullable` - infer optionals from model, and all controls will be nullable 
-* `InferModeOptional & InferModeNonNullable` - makes all fields optional and all controls will be nonnullable
-* `InferModeOptional & InferModeNullable` - makes all fields optional, and all controls will be nnullable
-* `InferModeOptional & InferModeFromModel` - makes all fields optional, and controls infer nullability from model
-* `InferModeRequired & InferModeNonNullable` - makes all fields required, and all controls will be nonnullable
-* `InferModeRequired & InferModeNullable` - makes all fields required, and all controls will be nnullable
-* `InferModeRequired & InferModeFromModel` - makes all fields required, and controls infer nullability from model
-
-Also you can check [/tests/infermode.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/infermode.test.ts)
 
 ## Examples Of Usage
 
