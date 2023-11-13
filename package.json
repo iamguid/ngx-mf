@@ -32,7 +32,6 @@
     "@types/jest": "^28.1.4",
     "del": "^6.1.1",
     "gulp": "^4.0.2",
-    "gulp-header": "^2.0.9",
     "jest": "^28.1.2",
     "rxjs": "^7.8.1",
     "ts-jest": "^28.0.5",
@@ -42,7 +41,7 @@
     "@angular/forms": ">=14.0.0"
   },
   "scripts": {
-    "build": "yarn gulp clean && yarn tsc --build && yarn gulp addTsNoCheckHeader",
+    "build": "yarn gulp clean && yarn tsc --build",
     "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir tests",
     "pub": "yarn test && npm publish"
   }
