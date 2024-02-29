@@ -94,6 +94,8 @@ type FormModelInnerTraverse<
   // If we have Object type in annotation
   // and current object is Object
   // then infer FormGroup type recursively
+  : unknown extends TAnnotations
+  ? FormModelInnerTraverse<TModel, FormElementControl>
   : TAnnotations extends Record<string, any>
     ? TModel extends Record<string, any>
       ? FormGroup<FormModelKeyofTraverse<TModel, TAnnotations>>
