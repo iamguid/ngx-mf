@@ -17,7 +17,7 @@ declare type OnlyKeys<T> = {
     [key in keyof T]-?: any;
 };
 declare type FormModelKeyofTraverse<TModel extends Record<string, any>, TAnnotations extends (OnlyKeys<TModel> | FormElementType)> = {
-    [key in keyof OnlyKeys<TModel>]: FormModelInnerTraverse<TModel[key], TAnnotations extends OnlyKeys<TModel>[key] ? TAnnotations[key] : TAnnotations>;
+    [key in keyof OnlyKeys<TModel>]: FormModelInnerTraverse<TModel[key], TAnnotations extends OnlyKeys<TModel>[key] ? unknown extends TAnnotations[key] ? FormElementControl : TAnnotations[key] : TAnnotations>;
 };
 declare type FormModelInnerTraverse<TModel, TAnnotations> = TAnnotations extends null ? TModel extends Array<any> ? FormModelInnerTraverse<TModel, FormElementArray> : TModel extends Record<string, any> ? FormModelInnerTraverse<TModel, FormElementGroup> : FormModelInnerTraverse<TModel, FormElementControl> : TAnnotations extends FormElementArray ? TModel extends Array<infer TInferredArrayValueType> ? FormArray<FormControl<TInferredArrayValueType>> : never : TAnnotations extends FormElementGroup ? TModel extends Record<string, any> ? FormGroup<FormModelKeyofTraverse<TModel, FormElementGroup>> : never : TAnnotations extends FormElementControl ? FormControl<TModel> : TAnnotations extends Replace<infer TInferredReplace> ? TInferredReplace : TAnnotations extends Array<infer TInferedAnnotations> ? TModel extends Array<infer TInferedArrayType> ? FormArray<FormModelInnerTraverse<TInferedArrayType, TInferedAnnotations>> : never : TAnnotations extends Record<string, any> ? TModel extends Record<string, any> ? FormGroup<FormModelKeyofTraverse<TModel, TAnnotations>> : never : FormModelInnerTraverse<TModel, FormElementControl>;
 export {};

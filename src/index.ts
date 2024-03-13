@@ -28,7 +28,11 @@ type FormModelKeyofTraverse<
   [key in keyof OnlyKeys<TModel>]:
     FormModelInnerTraverse<
       TModel[key],
-      TAnnotations extends OnlyKeys<TModel>[key] ? TAnnotations[key] : TAnnotations
+      TAnnotations extends OnlyKeys<TModel>[key]
+        ? unknown extends TAnnotations[key]
+          ? FormElementControl
+          : TAnnotations[key]
+        : TAnnotations
     >
 }
 
