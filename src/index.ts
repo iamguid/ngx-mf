@@ -6,7 +6,7 @@ export type FormModel<
   TAnnotations extends Record<string, any> | null = null,
 > = FormModelInnerTraverse<TModel, TAnnotations>
 
-// Special type for annotation
+// Special type for annotation to completely replace inferred type
 export type Replace<T extends AbstractControl> = T & { __replace__: '__replace__' };
 
 // Variants of form elements types
@@ -15,12 +15,12 @@ export type FormElementGroup = { __group__: '__group__' }
 export type FormElementArray = { __array__: '__array__' }
 export type FormElementType = FormElementControl | FormElementGroup | FormElementArray | Replace<any>
 
-// Remove optionals and save object structure
+// Remove optionals and save model structure
 type OnlyKeys<T> = {
   [key in keyof T]-?: any
 }
 
-// Traverse every key in object and transform it to form element recursively
+// Traverse every key in model and transform it to form element recursively
 type FormModelKeyofTraverse<
   TModel extends Record<string, any>,
   TAnnotations extends (OnlyKeys<TModel> | FormElementType),
@@ -32,7 +32,7 @@ type FormModelKeyofTraverse<
     >
 }
 
-// Infer type of current object as form element type recursively
+// Infer type of current model as form element type recursively
 type FormModelInnerTraverse<
   TModel,
   TAnnotations,
@@ -48,7 +48,7 @@ type FormModelInnerTraverse<
   // FormArray annotation
   //
   // If we have array in annotation 
-  // and current record is array 
+  // and current model is array 
   // then infer FormArray type recursively
   : TAnnotations extends FormElementArray
     ? TModel extends Array<infer TInferredArrayValueType>
@@ -58,7 +58,7 @@ type FormModelInnerTraverse<
   // FormGroup annotation
   //
   // If we have group in annotation
-  // and current object has keys
+  // and current model has keys
   // then infer FormGroup type recursively
   : TAnnotations extends FormElementGroup
     ? TModel extends Record<string, any>
@@ -82,7 +82,7 @@ type FormModelInnerTraverse<
   // FormArray type annotation
   //
   // If we have array type in annotation
-  // and current object is array
+  // and current model is array
   // then infer FormArray type recursively
   : TAnnotations extends Array<infer TInferedAnnotations>
     ? TModel extends Array<infer TInferedArrayType>
@@ -91,12 +91,13 @@ type FormModelInnerTraverse<
 
   // FormGroup type annotation
   //
-  // If we have Object type in annotation
-  // and current object is Object
+  // If we have Record type in annotation
+  // and current model is Record
   // then infer FormGroup type recursively
   : TAnnotations extends Record<string, any>
     ? TModel extends Record<string, any>
       ? FormGroup<FormModelKeyofTraverse<TModel, TAnnotations>>
       : never
 
+  // Behaviour by default
   : FormModelInnerTraverse<TModel, FormElementControl>
