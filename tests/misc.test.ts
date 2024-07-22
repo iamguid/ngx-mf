@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder } from "@angular/forms";
-import { FormElementControl, FormElementGroup, FormModel } from "../src";
+import { FormElementControl, FormElementGroup, FormModel, FormType, T } from "../src";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field should be nonnullalbe', () => {
@@ -11,14 +11,16 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model>;
+        type Form = FormModel<Model, FormElementGroup>;
+
+        type t = Form['controls']
 
         const form: Form = fb.group<Form['controls']>({
             a: fb.control(42)
         })
 
         expect(form.value.a).toBe(42);
-        expect(form.controls.a.value).toBe(42);
+        expect(form.controls.a?.value).toBe(42);
     })
 
     it('nested undefined nullable optional fields should be nonnullable', () => {
@@ -40,7 +42,7 @@ describe('Misc tests', () => {
         })
 
         expect(form.value.a?.b).toBe(42);
-        expect(form.controls.a.controls.b.value).toBe(42);
+        expect(form.controls.a?.controls.b?.value).toBe(42);
     })
 
     it('Date inside FormControl', () => {
@@ -211,16 +213,16 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: { b: FormElementControl } }>;
+        type Form = FormType<Model, { a: { b: FormElementControl } }>;
 
-        const form: Form = fb.group<Form['controls']>({
-            a: fb.group<Form['controls']['a']['controls']>({
+        const form: Form[T] = fb.group<Form[T]['controls']>({
+            a: fb.group<Form['a'][T]['controls']>({
                 b: fb.control(null)
             })
         })
 
         expect(form.value.a?.b).toBeNull();
-        expect(form.controls.a.controls.b.value).toBeNull();
+        expect(form.controls.a?.controls.b?.value).toBeNull();
     })
 
     it('Link property https://github.com/iamguid/ngx-mf/issues/5', () => {
@@ -255,11 +257,11 @@ describe('Misc tests', () => {
         const fb = new FormBuilder().nonNullable;
       
         const wf = fb.group<OptionalForm['controls']>({
-            optionalA: fb.control(321), // when field is optinal, control should be required
-            optionalB: fb.control(123), // when field is optinal, control should be required
-            optionalC: fb.control(undefined), // when undefined on value, control value should be undefinable too
-            optionalD: fb.control(undefined), // when undefined on value and field is optional, control value should be undefinable too
-            optionalE: fb.control(432), // when undefined on value and field is optional, control should be required
+            // optionalA: fb.control(321),
+            optionalB: fb.control(123),
+            optionalC: fb.control(undefined),
+            optionalD: fb.control(undefined),
+            optionalE: fb.control(432),
         });
     })
 })

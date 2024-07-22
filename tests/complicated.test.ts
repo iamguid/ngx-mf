@@ -1,7 +1,7 @@
 import "@angular/compiler";
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormElementArray, FormElementGroup, FormModel } from "../src";
+import { FormElementArray, FormElementGroup, FormModel, FormType, G, I, T } from "../src";
 
 describe('Complicated test', () => {
     it('Two models', () => {
@@ -17,19 +17,18 @@ describe('Complicated test', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model1, { b: [FormElementGroup] }>;
+        type Form = FormType<Model1, { b: [FormElementGroup] }>;
 
-        const form: Form = fb.group<Form['controls']>({
-            a: fb.control(42),
-            b: fb.array<NonNullable<Form['controls']['b']>['controls'][0]>([
-                fb.group<NonNullable<Form['controls']['b']>['controls'][0]['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
+            b: fb.array<Form['b'][I][T]>([
+                fb.group<Form['b'][I][G]>({
                     a: fb.control('test'),
                     b: fb.control('test')
                 })
             ])
         })
 
-        expect(form.value.a).toBe(42);
+        expect(form.value.a).toBe(undefined);
         expect(form.value.b![0].a).toBe('test');
         expect(form.value.b![0].b).toBe('test');
     })

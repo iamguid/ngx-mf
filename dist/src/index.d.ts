@@ -1,24 +1,45 @@
 import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
-export declare type FormModel<TModel, TAnnotations extends Record<string, any> | null = null> = FormModelInnerTraverse<TModel, TAnnotations>;
-export declare type Replace<T extends AbstractControl> = T & {
-    __replace__: '__replace__';
+export type FormModel<TModel, TAnnotation extends FormElementTree = null> = BuildFormTreeNode<TModel, TAnnotation>;
+export type FormType<TModel, TAnnotation extends FormElementTree = null> = BuildFormTypeTreeNode<TModel, TAnnotation>;
+export type FormElementControl = {
+    __kind__: '__control__';
 };
-export declare type FormElementControl = {
-    __control__: '__control__';
+export type FormElementGroup = {
+    __kind__: '__group__';
 };
-export declare type FormElementGroup = {
-    __group__: '__group__';
+export type FormElementArray = {
+    __kind__: '__array__';
 };
-export declare type FormElementArray = {
-    __array__: '__array__';
+export type FormElement = FormElementControl | FormElementGroup | FormElementArray;
+export type FormElementTree = {
+    [key: string]: FormElementTree;
+} | Array<FormElementTree> | FormElement | null;
+declare const T: unique symbol;
+declare const I: unique symbol;
+declare const G: unique symbol;
+export type T = typeof T;
+export type I = typeof I;
+export type G = typeof G;
+type Structure<T, TValue = any> = {
+    [key in keyof T]?: TValue;
 };
-export declare type FormElementType = FormElementControl | FormElementGroup | FormElementArray | Replace<any>;
-declare type OnlyKeys<T> = {
-    [key in keyof T]-?: any;
+type BuildFormTypeTreeKeyof<TModel extends Record<string, any>, TAnnotation extends Structure<TModel>> = {
+    [key in keyof Required<TModel>]-?: BuildFormTypeTreeNode<TModel[key], TAnnotation[key]>;
 };
-declare type FormModelKeyofTraverse<TModel extends Record<string, any>, TAnnotations extends (OnlyKeys<TModel> | FormElementType)> = {
-    [key in keyof OnlyKeys<TModel>]: FormModelInnerTraverse<TModel[key], TAnnotations extends OnlyKeys<TModel>[key] ? unknown extends TAnnotations[key] ? FormElementControl : TAnnotations[key] : TAnnotations>;
+type BuildFormTypeTreeNode<TModel, TAnnotation extends FormElementTree, TResult extends AbstractControl = BuildFormTreeNode<TModel, TAnnotation>> = TResult extends FormArray ? {
+    [T]: TResult;
+    [I]: TModel extends Array<infer TArrayElement> ? TAnnotation extends Array<infer TArrayElementAnnotation extends FormElementTree> ? BuildFormTypeTreeNode<TArrayElement, TArrayElementAnnotation> : TAnnotation extends FormElementArray ? BuildFormTypeTreeNode<TArrayElement, FormElementArray> : TResult['controls'][0] : BuildFormTypeTreeNode<TModel, TAnnotation>;
+} : TResult extends FormGroup ? {
+    [T]: TResult;
+    [G]: TResult['controls'];
+} & (TModel extends Record<string, any> ? BuildFormTypeTreeKeyof<TModel, TAnnotation> : never) : {
+    [T]: TResult;
 };
-declare type FormModelInnerTraverse<TModel, TAnnotations> = TAnnotations extends null ? TModel extends Array<any> ? FormModelInnerTraverse<TModel, FormElementArray> : TModel extends Record<string, any> ? FormModelInnerTraverse<TModel, FormElementGroup> : FormModelInnerTraverse<TModel, FormElementControl> : TAnnotations extends FormElementArray ? TModel extends Array<infer TInferredArrayValueType> ? FormArray<FormControl<TInferredArrayValueType>> : never : TAnnotations extends FormElementGroup ? TModel extends Record<string, any> ? FormGroup<FormModelKeyofTraverse<TModel, FormElementGroup>> : never : TAnnotations extends FormElementControl ? FormControl<TModel> : TAnnotations extends Replace<infer TInferredReplace> ? TInferredReplace : TAnnotations extends Array<infer TInferedAnnotations> ? TModel extends Array<infer TInferedArrayType> ? FormArray<FormModelInnerTraverse<TInferedArrayType, TInferedAnnotations>> : never : TAnnotations extends Record<string, any> ? TModel extends Record<string, any> ? FormGroup<FormModelKeyofTraverse<TModel, TAnnotations>> : never : FormModelInnerTraverse<TModel, FormElementControl>;
+type BuildFormTreeKeyof<TModel extends Record<string, any>, TAnnotation extends Structure<TModel>> = {
+    [key in keyof TModel]: BuildFormTreeNode<TModel[key], TAnnotation[key]>;
+};
+type BuildFormTreeNode<TModel, TAnnotation> = TAnnotation extends null ? TModel extends Array<any> ? BuildFormTreeNode<TModel, FormElementArray> : TModel extends Record<string, any> ? BuildFormTreeNode<TModel, FormElementGroup> : BuildFormTreeNode<TModel, FormElementControl> : TAnnotation extends FormElementArray ? TModel extends Array<infer TArrayElement> ? FormArray<FormControl<TArrayElement>> : never : TAnnotation extends FormElementGroup ? TModel extends Record<string, any> ? FormGroup<BuildFormTreeKeyof<TModel, {
+    [key in keyof TModel]: FormElementControl;
+}>> : never : TAnnotation extends FormElementControl ? FormControl<TModel> : TAnnotation extends Array<infer TArrayElementAnnotation extends FormElementTree> ? TModel extends Array<infer TArrayElement> ? FormArray<BuildFormTreeNode<TArrayElement, TArrayElementAnnotation>> : never : TAnnotation extends Structure<TModel, FormElementTree> ? TModel extends Record<string, any> ? FormGroup<BuildFormTreeKeyof<TModel, TAnnotation>> : never : BuildFormTreeNode<TModel, FormElementControl>;
 export {};
 //# sourceMappingURL=index.d.ts.map

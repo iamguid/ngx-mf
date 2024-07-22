@@ -1,107 +1,132 @@
 import { AbstractControl, FormArray, FormControl, FormGroup } from '@angular/forms';
 
-// Main type
+// FormModel
+// @deprecated
 export type FormModel<
   TModel,
-  TAnnotations extends Record<string, any> | null = null,
-> = FormModelInnerTraverse<TModel, TAnnotations>
+  TAnnotation extends FormElementTree = null,
+> = BuildFormTreeNode<TModel, TAnnotation>
 
-// Special type for annotation to completely replace inferred type
-export type Replace<T extends AbstractControl> = T & { __replace__: '__replace__' };
+// FormModel with Types for case where you have optional fields, and need to get form types
+export type FormType<
+  TModel,
+  TAnnotation extends FormElementTree = null,
+> = BuildFormTypeTreeNode<TModel, TAnnotation>
 
 // Variants of form elements types
-export type FormElementControl = { __control__: '__control__' }
-export type FormElementGroup = { __group__: '__group__' }
-export type FormElementArray = { __array__: '__array__' }
-export type FormElementType = FormElementControl | FormElementGroup | FormElementArray | Replace<any>
+export type FormElementControl = { __kind__: '__control__' }
+export type FormElementGroup = { __kind__: '__group__' }
+export type FormElementArray = { __kind__: '__array__' }
+export type FormElement = FormElementControl | FormElementGroup | FormElementArray
+export type FormElementTree = { [key: string]: FormElementTree } | Array<FormElementTree> | FormElement | null
 
-// Remove optionals and save model structure
-type OnlyKeys<T> = {
-  [key in keyof T]-?: any
+// Special symbols to get full/array/group type of current node from FormType structure
+const T = Symbol('T')
+const I = Symbol('I')
+const G = Symbol('G')
+export type T = typeof T
+export type I = typeof I
+export type G = typeof G
+
+// Remove optionals and leave only model structure
+type Structure<T, TValue = any> = {
+  [key in keyof T]?: TValue
 }
 
-// Traverse every key in model and transform it to form element recursively
-type FormModelKeyofTraverse<
+// Handle form type tree record
+type BuildFormTypeTreeKeyof<
   TModel extends Record<string, any>,
-  TAnnotations extends (OnlyKeys<TModel> | FormElementType),
+  TAnnotation extends Structure<TModel>,
 > = {
-  [key in keyof OnlyKeys<TModel>]:
-    FormModelInnerTraverse<
-      TModel[key],
-      TAnnotations extends OnlyKeys<TModel>[key]
-        ? unknown extends TAnnotations[key]
-          ? FormElementControl
-          : TAnnotations[key]
-        : TAnnotations
-    >
+  [key in keyof Required<TModel>]-?: BuildFormTypeTreeNode<TModel[key], TAnnotation[key]>
+} 
+
+// Handle form type tree node
+type BuildFormTypeTreeNode<
+  TModel,
+  TAnnotation extends FormElementTree,
+  TResult extends AbstractControl = BuildFormTreeNode<TModel, TAnnotation>
+> = TResult extends FormArray
+    ? { 
+        [T]: TResult,
+        [I]: TModel extends Array<infer TArrayElement> 
+          ? TAnnotation extends Array<infer TArrayElementAnnotation extends FormElementTree>
+            ? BuildFormTypeTreeNode<TArrayElement, TArrayElementAnnotation>
+            : TAnnotation extends FormElementArray
+              ? BuildFormTypeTreeNode<TArrayElement, FormElementArray>
+              : TResult['controls'][0] 
+          : BuildFormTypeTreeNode<TModel, TAnnotation> 
+      }
+    : TResult extends FormGroup
+      ? { 
+          [T]: TResult,
+          [G]: TResult['controls']
+        } & (TModel extends Record<string, any> ? BuildFormTypeTreeKeyof<TModel, TAnnotation> : never)
+    : { [T]: TResult }
+
+// Handle form tree record
+type BuildFormTreeKeyof<TModel extends Record<string, any>, TAnnotation extends Structure<TModel>> = {
+  [key in keyof TModel]: BuildFormTreeNode<TModel[key], TAnnotation[key]>
 }
 
-// Infer type of current model as form element type recursively
-type FormModelInnerTraverse<
-  TModel,
-  TAnnotations,
-> =
+// Handle form tree node
+type BuildFormTreeNode<TModel, TAnnotation> =
   // When annotations is not set
-  TAnnotations extends null
-  ? TModel extends Array<any>
-    ? FormModelInnerTraverse<TModel, FormElementArray>
+  TAnnotation extends null
+    ? TModel extends Array<any>
+      ? BuildFormTreeNode<TModel, FormElementArray>
     : TModel extends Record<string, any>
-      ? FormModelInnerTraverse<TModel, FormElementGroup>
-      : FormModelInnerTraverse<TModel, FormElementControl>
+      ? BuildFormTreeNode<TModel, FormElementGroup>
+  : BuildFormTreeNode<TModel, FormElementControl>
 
   // FormArray annotation
   //
   // If we have array in annotation 
   // and current model is array 
   // then infer FormArray type recursively
-  : TAnnotations extends FormElementArray
-    ? TModel extends Array<infer TInferredArrayValueType>
-      ? FormArray<FormControl<TInferredArrayValueType>>
-      : never
+  : TAnnotation extends FormElementArray
+    ? TModel extends Array<infer TArrayElement>
+      ? FormArray<FormControl<TArrayElement>>
+    : never
 
   // FormGroup annotation
   //
   // If we have group in annotation
   // and current model has keys
   // then infer FormGroup type recursively
-  : TAnnotations extends FormElementGroup
+  : TAnnotation extends FormElementGroup
     ? TModel extends Record<string, any>
-      ? FormGroup<FormModelKeyofTraverse<TModel, FormElementGroup>>
-      : never
+      ? FormGroup<BuildFormTreeKeyof<TModel, { [key in keyof TModel]: FormElementControl }>>
+    : never
 
   // FormControl annotation
   //
   // If we have control in annotation
   // then infer FormControl type
-  : TAnnotations extends FormElementControl
+  : TAnnotation extends FormElementControl
     ? FormControl<TModel>
-
-  // Replace annotation
-  //
-  // If we have Replace<T> in annotation
-  // then infer T
-  : TAnnotations extends Replace<infer TInferredReplace>
-    ? TInferredReplace
   
   // FormArray type annotation
   //
   // If we have array type in annotation
   // and current model is array
   // then infer FormArray type recursively
-  : TAnnotations extends Array<infer TInferedAnnotations>
-    ? TModel extends Array<infer TInferedArrayType>
-      ? FormArray<FormModelInnerTraverse<TInferedArrayType, TInferedAnnotations>>
-      : never
+  : TAnnotation extends Array<infer TArrayElementAnnotation extends FormElementTree>
+    ? TModel extends Array<infer TArrayElement>
+      ? FormArray<BuildFormTreeNode<TArrayElement, TArrayElementAnnotation>>
+    : never
 
   // FormGroup type annotation
   //
   // If we have Record type in annotation
   // and current model is Record
   // then infer FormGroup type recursively
-  : TAnnotations extends Record<string, any>
+  : TAnnotation extends Structure<TModel, FormElementTree>
     ? TModel extends Record<string, any>
-      ? FormGroup<FormModelKeyofTraverse<TModel, TAnnotations>>
-      : never
+      ? FormGroup<BuildFormTreeKeyof<TModel, TAnnotation>>
+    : never
 
-  // Behaviour by default
-  : FormModelInnerTraverse<TModel, FormElementControl>
+  // by default
+  : BuildFormTreeNode<TModel, FormElementControl>
+
+// #endregion
