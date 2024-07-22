@@ -2,7 +2,7 @@
   "name": "ngx-mf",
   "version": "4.1.0",
   "description": "Bind your model types to angular FormGroup type",
-  "author": "Vladislav <iam.guid@gmail.com>",
+  "author": "Vladislav Lebedev <iam.guid@gmail.com>",
   "license": "MIT",
   "private": false,
   "repository": {
@@ -22,7 +22,7 @@
     "binding"
   ],
   "engines": {
-    "node": "^18.19.1 || ^20.11.1 || >=22.0.0"
+    "node": ">=18.19.1"
   },
   "type": "module",
   "module": "./build/src/index.mjs",
