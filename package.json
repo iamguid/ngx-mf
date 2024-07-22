@@ -2,8 +2,9 @@
   "name": "ngx-mf",
   "version": "4.1.0",
   "description": "Bind your model types to angular FormGroup type",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "author": "Vladislav <iam.guid@gmail.com>",
+  "license": "MIT",
+  "private": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/iamguid/ngx-mf"
@@ -20,29 +21,36 @@
     "model",
     "binding"
   ],
-  "author": "Vladislav <iam.guid@gmail.com>",
-  "license": "MIT",
-  "private": false,
-  "type": "commonjs",
+  "engines": {
+    "node": "^18.19.1 || ^20.11.1 || >=22.0.0"
+  },
+  "type": "module",
+  "module": "./build/src/index.mjs",
+  "typings": "./build/src/index.d.mts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./build/src/index.d.mts",
+      "default": "./build/src/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "npm run build && NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest",
+    "pub": "npm run test && npm publish"
+  },
   "devDependencies": {
     "@angular/common": "^18.1.1",
     "@angular/compiler": "^18.1.1",
     "@angular/core": "^18.1.1",
     "@angular/forms": "^18.1.1",
-    "@types/jest": "^28.1.4",
-    "del": "^6.1.1",
-    "gulp": "^4.0.2",
-    "jest": "^28.1.2",
-    "rxjs": "^7.8.1",
-    "ts-jest": "^28.0.5",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
     "typescript": "^5.5.3"
   },
   "peerDependencies": {
     "@angular/forms": ">=14.0.0"
-  },
-  "scripts": {
-    "build": "yarn gulp clean && yarn tsc --build",
-    "test": "yarn run build && node --experimental-vm-modules node_modules/jest/bin/jest.js --rootDir tests",
-    "pub": "yarn test && npm publish"
   }
 }

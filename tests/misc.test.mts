@@ -1,7 +1,7 @@
-import "@angular/compiler";
+import "@angular/compiler"
 
 import { FormBuilder } from "@angular/forms";
-import { FormElementControl, FormElementGroup, FormModel, FormType, T } from "../src";
+import { FormElementControl, FormElementGroup, FormModel, FormType, T } from "../src/index.mjs";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field should be nonnullalbe', () => {

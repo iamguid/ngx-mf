@@ -1,7 +1,7 @@
-import "@angular/compiler";
+import "@angular/compiler"
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
-import { FormElementArray, FormElementGroup, FormModel } from "../src"
+import { FormElementArray, FormElementGroup, FormModel } from "../src/index.mjs"
 
 interface SimpleModel {
     a: number;

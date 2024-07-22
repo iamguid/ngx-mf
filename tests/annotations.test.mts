@@ -1,7 +1,7 @@
-import "@angular/compiler";
+import "@angular/compiler"
 
-import { FormBuilder, FormControl } from "@angular/forms";
-import { I, FormElementArray, FormElementControl, FormElementGroup, FormModel, FormType, T, G } from "../src";
+import { FormBuilder } from "@angular/forms";
+import { T, G, I, FormElementArray, FormElementControl, FormElementGroup, FormModel, FormType } from "../src/index.mjs";
 
 describe('Test FormModel annotations', () => {
     it('all primitives without annotations', () => {

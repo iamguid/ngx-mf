@@ -128,5 +128,3 @@ type BuildFormTreeNode<TModel, TAnnotation> =
 
   // by default
   : BuildFormTreeNode<TModel, FormElementControl>
-
-// #endregion

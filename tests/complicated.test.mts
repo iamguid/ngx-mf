@@ -1,7 +1,7 @@
-import "@angular/compiler";
+import "@angular/compiler"
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormElementArray, FormElementGroup, FormModel, FormType, G, I, T } from "../src";
+import { FormElementArray, FormElementGroup, FormModel, FormType, G, I, T } from "../src/index.mjs";
 
 describe('Complicated test', () => {
     it('Two models', () => {

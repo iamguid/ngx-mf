@@ -1,7 +1,7 @@
-import "@angular/compiler";
+import "@angular/compiler"
 
 import { FormBuilder, Validators } from "@angular/forms"
-import { FormElementGroup, FormModel } from "../src"
+import { FormElementGroup, FormModel } from "../src/index.mjs"
 
 describe('Examples', () => {
     it('User form example', () => {
