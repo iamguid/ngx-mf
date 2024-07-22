@@ -1,10 +1,7 @@
 # ngx-mf
-`ngx-mf` is a small (100 lines of code) zero dependency set of TypeScript types for recursive
-infer angular `FormGroup`, `FormArray` or `FormControl` type
-from model type.
+`ngx-mf` is a small (100 lines of code) zero dependency set of TypeScript types for recursive infer angular `FormGroup`, `FormArray` or `FormControl` type from your model type.
 
-It doesn't increase your bundle size because it's just
-TypeScript types.
+It doesn't increase your bundle size because it's just TypeScript types.
 
 ## Installation
 
@@ -20,14 +17,9 @@ yarn
 $ yarn add ngx-mf
 ```
 
-## Restrictions
-
-* You cant use array syntax with `FormControlState`, it is a bug on angular side,
-but in other syntax (with constructor and FormBuilder) it works fine
-
 ## How It Works
 
-We define some model:
+Define some model:
 
 ```typescript
 enum ContactType {
@@ -41,7 +33,7 @@ interface IContactModel {
 }
 
 interface IUserModel {
-    id: number;
+    id?: number;
     firstName: string;
     lastName: string;
     nickname: string;
@@ -50,16 +42,17 @@ interface IUserModel {
 }
 ```
 
-Then we define some magic type, like:
+Then define your form type based on IUserModel:
 
 ```typescript
-Type Form = FormModel<IUserModel, { contacts: [FormElementGroup] }>
+type Form = FormType<IUserModel, { contacts: [FormElementGroup] }>
 ```
 
-Then we have type, based on our model, before form will be define:
+Then you have form type, before form will be defined:
 
 ```typescript
 FormGroup<{
+    id?: FormControl<number | undefined> | undefined; 
     firstName: FormControl<string | null>;
     lastName: FormControl<string | null>;
     nickname: FormControl<string | null>;
@@ -73,17 +66,13 @@ FormGroup<{
 
 ## Usage
 
-`ngx-mf` exports type `FormModel`
+`ngx-mf` exports type `FormModel` and `FormType`
 
-`FormModel<TModel, TAnnotations>` - This is the type
-that recursively turns `TModel` fields (where `TModel` is your model type)
-into a `FormGroup`, `FormArray` or `FormControl`.
-You can choose what you want: `FormGroup`, `FormArray` or `FormControl`
-by annotations.
-You can pass `TAnnotations` as the second argument to specify
-output type using special syntax.
+`FormModel<TModel, TAnnotations>` - This is the type that recursively turns `TModel` fields (where `TModel` is your model type) into a `FormGroup`, `FormArray` or `FormControl`.
+You can choose what you want: `FormGroup`, `FormArray` or `FormControl` by annotation.
+You can pass `TAnnotations` as the second argument to specify output type using special easy to use syntax.
 
-For example we have some model from How It Works chapter:
+For example you have some model from How It Works chapter:
 
 ```typescript
 enum ContactType {
@@ -97,7 +86,7 @@ interface IContactModel {
 }
 
 interface IUserModel {
-    id: number;
+    id?: number;
     firstName: string;
     lastName: string;
     nickname: string;
@@ -106,89 +95,53 @@ interface IUserModel {
 }
 ```
 
-Lets say we want, for example, infer `FormGroup` where
-fields `firstName`, `lastName`, `nickname`, `birthday`
-should be `FormControl` and field `contacts` should be
-`FormArray` of `FormGroups`.
+Lets say we want infer `FormGroup` where fields `firstName`, `lastName`, `nickname`, `birthday` should be `FormControl` and field `contacts` should be `FormArray` of `FormGroups`.
 
-First of all we need to exclude `id` from our model,
-it is needed because all fields are required.
-If we need to exclude some fields we
-should omit or pick them from source model.
-
-```typescript
-Omit<IUserModel, 'id'>
-```
-
-If we want to add some field then we should using `&`
-operator or extends interface, for examle:
-
-```typescript
-IUserModel & {
-    someField: number;
-}
-```
-
-Then we want to specify `contacts` as `FormArray` and specify
-every contact as `FormGroup`, so we need to pass annotation
-in our `FormModel` type. The syntax of annotation would
-be like that:
+For that we need to pass annotation in our `FormModel` type.
+ The syntax of annotation will be:
 
 ```typescript
 { contacts: [FormElementGroup] }
 ```
 
-Where `contacts` is our field, `[FormElementGroup]` indicates that
-field is `FormArray`, `FormElementGroup` indicates that we have
-`FormGroup` inside `FormArray`.
+Where `contacts` is our field, `[FormElementGroup]` indicates that field is `FormArray`.
+`FormElementGroup` indicates that we have `FormGroup` inside `FormArray`.
 
 So our full `UserForm` type should be:
 ```typescript
-FormModel<Omit<IUserModel, 'id'>, { contacts: [FormElementGroup] }>
+FormModel<IUserModel, { contacts: [FormElementGroup] }>
 ```
 
 You can find full example
 here [/tests/example.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/example.test.ts)
 
+I strongly recommend always use `FormType`
+
+`FormType<TModel, TAnnotations>` - This is the type that recursively turns `TModel` fields (where `TModel` is your model type) into special types tree that you can use for shortcuts to form types.
+`FormType` returns tree with your model structure and additional fields for shortcuts, there is 3 type of shortcuts:
+* `T` - just type of full form for current node, something like `FormGroup<...>`
+* `G` - group type of your FromGroup, looks like `{a: FromControl<...>, b: FormControl<...>}`
+* `I` - array item type of your FormArray, looks like `FormControl<...>`
+
+You can combine keys of your model and this additional fields for every level of your type to get type that you need.
+
 ## Annotations
-`ngx-mf` annotations have three different keywords: `FormElementArray`,
-`FormElementGroup`, `FormElementControl` and special type `Replace`
+`ngx-mf` annotations have three different keywords: `FormElementArray`, `FormElementGroup`, `FormElementControl`
 
 * `FormElementArray` - infer `FormArray`
 * `FormElementGroup` - infer `FormGroup`
 * `FormElementControl` - infer `FormControl`
-* `Replace<T>` - if you want replace inferred type to `T`
 
-Also annotations can be objects like `{a: FormElementGroup}`,
-and arrays like `[FormElementGroup]`.
-
-And you can combine `{}`, `[]`, `FormElementArray`, `FormElementGroup`, `FormElementControl`
-to specify what you want.
+Also annotations can be objects, like `{a: FormElementGroup}`,
+and arrays, like `[FormElementGroup]`.
 
 If you use `{}` then object with the same nesting will be `FormGroup`
 If you use `[]` then object with the same nesting will be `FormArray`
 
-When you want to full replace inferred type you 
-can use `Replace<T>`
+And you can combine `keys of TModel`, `{}`, `[]`, `FormElementArray`, `FormElementGroup`, `FormElementControl`
+to specify what you want to infer in result type.
 
-For example: we have `FormGroup`, but want `FormControl`:
-
-```typescript
-interface Model {
-    a: {
-        b: number;
-    }
-}
-
-type Form = FormModel<Model, { a: Replace<FormControl<number | null>> }>;
-
-// Form inferred:
-FormGroup<{
-    a: FormControl<number | null>;
-}>
-```
-
-Also you can check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
+Check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts) for details
 
 ## Examples Of Usage
 
@@ -237,6 +190,8 @@ Lets see what `FormModel` will do without annotations
 
 As we see each `FormGroup` elements is `FormControl` 
 it is the default behavior of `FormModel`
+
+The same behavior for `FormType`, but `FormType` will provide you tree of form types
 
 ---
 
@@ -381,58 +336,47 @@ Other examples you can find in annotation tests
 
 ## Questions
 
-> Q: Why i cannot just use `FormGroup<Model>` ?
+> Q: Why i can't use just `FormGroup<Model>` ?
 > 
-> A: Because when your model have nested fields,
-> then it wouldn't work
+> A: Because when your model have nested fields, then it won't work
 
-> Q: Why i cannot define form just as `FormGroup` ?
+> Q: Why i can't define form just as `FormGroup` ?
 > 
 > A: Because then you loose your types
 
-> Q: Why i cannot define forms without binding
+> Q: Why i can't define forms without binding
 > it to model type ?
 > 
-> A: Yes you can, but it's more usefull to bind it
+> A: Yes you can, but it's more usefull to bind it, because if you change the model it will better to see inconsystency directly in your form
 
-> Q: Why i cannot init form when define it and use
-> `typeof` to infer form type?
+> Q: Why i can't init form when define it and use `typeof` to infer form type?
 > 
 > A: Yes you can, it is another way to save form type
 > and you can use `typeof` to get type of form,
-> to pass it to the method but when your model will
+> to pass it to the method, but when your model will
 > change then you will see errors only in the places
-> where you use `patch` > or `setValue` or thomething like that,
-> i think it is inderect errors, but when you bind
-> forms to models you see errors on the form definition.
-> But anyway in that case you can't to get types of your form before
+> where you use `patch` > or `setValue`,
+> but it is inderect errors, and when you bind
+> forms to models you will see errors on the form definition.
+> But, anyway in that case you can't to get types of your form before
 > it will be define
 
 > Q: What about dynamic forms ?
 > 
 > A: you can make some fields optional and enable/disable
 > it when you need it.
-> You can use `Replace` special type
-> to define what you want to infer (see Annotations chapter)
-> You can `Replace` inferred type to something like `FormGroup<any>`
-> and then cast it to your types if you really need it.
 
-> Q: What about complicated forms that includes many of
-> fields, groups and controls
+> Q: What about complicated forms that includes many of fields, groups and controls
 > 
-> A: It is the main idea of `ngx-mf` :)
+> A: It is the main scenario of `ngx-mf`
 
 ## Tips And Tricks
 
-* Always pass type `Form['controls']` when you create your
-form. Because it will be more simpler to debug wrong types,
-allow you not to specify controls types.
+* Always use `FormType` types when you create your form.
+Because it will be more simpler to debug wrong types, and it allow you to not to specify controls types directly.
 
-* Use FormBuilder (`fb.group<Form['controls']>(...)`) or
-constructor (`new FormGroup<Form['controls']>(...)`)
-syntax to define your forms.
-Because if you use array syntax, then you can't pass
-argument to FormGroup type.
+* Use FormBuilder (`fb.group<Form[G]>(...)`) or constructor (`new FormGroup<Form[G]>(...)`) syntax to define your forms.
+Because if you use array syntax, then you can't pass argument to FormGroup type.
 
 ## Links
 * Reddit topic - https://www.reddit.com/r/angular/comments/vv2xmd/what_do_you_think_about_generating_formgroup_type/
