@@ -1,7 +1,7 @@
 import "@angular/compiler"
 
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms"
-import { FormElementArray, FormElementGroup, FormModel } from "../src/index.mjs"
+import { FormElementArray, FormElementGroup, FormType, G, I, T } from "../src/index.mjs"
 
 interface SimpleModel {
     a: number;
@@ -20,7 +20,9 @@ interface ArrayModel {
 describe('Test different form definition syntax', () => {
     describe('Plain forms', () => {
         it('constructor syntax', () => {
-            const form: FormModel<SimpleModel> = new FormGroup({
+            type Form = FormType<SimpleModel>
+
+            const form: Form[T] = new FormGroup<Form[G]>({
                 a: new FormControl(42, { nonNullable: true })
             })
 
@@ -29,9 +31,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('FormBuilder syntax', () => {
+            type Form = FormType<SimpleModel>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: Form[T] = fb.group<Form[G]>({
                 a: fb.control(42)
             })
 
@@ -40,9 +44,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('array syntax', () => {
+            type Form = FormType<SimpleModel>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: Form[T] = fb.group({
                 a: [42]
             })
 
@@ -53,8 +59,10 @@ describe('Test different form definition syntax', () => {
 
     describe('Nested FormGroup', () => {
         it('constructor syntax', () => {
-            const form: FormModel<NestedModel, { a: FormElementGroup }> = new FormGroup({
-                a: new FormGroup({
+            type Form = FormType<NestedModel, { a: FormElementGroup }>
+
+            const form: Form[T] = new FormGroup<Form[G]>({
+                a: new FormGroup<Form['a'][G]>({
                     b: new FormControl(42, { nonNullable: true })
                 })
             })
@@ -64,10 +72,12 @@ describe('Test different form definition syntax', () => {
         })
 
         it('FormBuilder syntax', () => {
+            type Form = FormType<NestedModel, { a: FormElementGroup }>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<NestedModel, { a: FormElementGroup }> = fb.group({
-                a: fb.group({
+            const form: Form[T] = fb.group<Form[G]>({
+                a: fb.group<Form['a'][G]>({
                     b: fb.control(42)
                 })
             })
@@ -77,9 +87,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('array syntax', () => {
+            type Form = FormType<NestedModel, { a: FormElementGroup }>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<NestedModel, { a: FormElementGroup }> = fb.group({
+            const form: Form[T] = fb.group<Form[G]>({
                 a: fb.group({
                     b: [42]
                 })
@@ -92,8 +104,10 @@ describe('Test different form definition syntax', () => {
 
     describe('Nested FormArray', () => {
         it('constructor syntax', () => {
-            const form: FormModel<ArrayModel, { a: FormElementArray }> = new FormGroup({
-                a: new FormArray([
+            type Form = FormType<ArrayModel, { a: FormElementArray }>
+
+            const form: Form[T] = new FormGroup<Form[G]>({
+                a: new FormArray<Form['a'][I]>([
                     new FormControl(42, { nonNullable: true })
                 ])
             })
@@ -103,10 +117,12 @@ describe('Test different form definition syntax', () => {
         })
 
         it('FormBuilder syntax', () => {
+            type Form = FormType<ArrayModel, { a: FormElementArray }>
+
             const fb = new FormBuilder();
 
-            const form: FormModel<ArrayModel, { a: FormElementArray }> = fb.group({
-                a: fb.array([
+            const form: Form[T] = fb.group<Form[G]>({
+                a: fb.array<Form['a'][I]>([
                     fb.control(42, { nonNullable: true })
                 ])
             })
@@ -118,7 +134,9 @@ describe('Test different form definition syntax', () => {
 
     describe('from with validators', () => {
         it('constructor syntax', () => {
-            const form: FormModel<SimpleModel> = new FormGroup({
+            type Form = FormType<SimpleModel>
+
+            const form: Form[T] = new FormGroup<Form[G]>({
                 a: new FormControl(42, { nonNullable: true, validators: [Validators.required] })
             })
 
@@ -127,9 +145,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('FormBuilder syntax', () => {
+            type Form = FormType<SimpleModel>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: Form[T] = fb.group<Form[G]>({
                 a: fb.control(42, [Validators.required])
             })
 
@@ -138,9 +158,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('array syntax', () => {
+            type Form = FormType<SimpleModel>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: Form[T] = fb.group({
                 a: [42, [Validators.required]]
             })
 
@@ -151,7 +173,9 @@ describe('Test different form definition syntax', () => {
 
     describe('value as FormControlState', () => {
         it('constructor syntax', () => {
-            const form: FormModel<SimpleModel> = new FormGroup({
+            type Form = FormType<SimpleModel>
+
+            const form: Form[T] = new FormGroup<Form[G]>({
                 a: new FormControl({ value: 42, disabled: false }, { nonNullable: true })
             })
 
@@ -160,9 +184,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('FormBuilder syntax', () => {
+            type Form = FormType<SimpleModel>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: Form[T] = fb.group<Form[G]>({
                 a: fb.control({ value: 42, disabled: false })
             })
 
@@ -171,9 +197,11 @@ describe('Test different form definition syntax', () => {
         })
 
         it('array syntax', () => {
+            type Form = FormType<SimpleModel>
+
             const fb = new FormBuilder().nonNullable;
 
-            const form: FormModel<SimpleModel> = fb.group({
+            const form: Form[T] = fb.group({
                 a: [{ value: 42, disabled: false }]
             })
 

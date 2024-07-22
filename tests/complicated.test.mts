@@ -1,7 +1,7 @@
 import "@angular/compiler"
 
 import { FormBuilder, FormGroup } from "@angular/forms";
-import { FormElementArray, FormElementGroup, FormModel, FormType, G, I, T } from "../src/index.mjs";
+import { FormElementArray, FormElementGroup, FormType, G, I, T } from "../src/index.mjs";
 
 describe('Complicated test', () => {
     it('Two models', () => {
@@ -33,7 +33,7 @@ describe('Complicated test', () => {
         expect(form.value.b![0].b).toBe('test');
     })
 
-    it('Build complicated form using two models', () => {
+    it('Build complicated form using union with two models', () => {
         interface Model1 {
             a: number
             b: number
@@ -46,23 +46,40 @@ describe('Complicated test', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Model1FormPart = FormModel<Model1, null>;
-        type Model2FormPart = FormModel<Model2, null>;
+        type Form1 = FormType<Model1>;
+        type Form2 = FormType<Model2>;
+        type Form = FormType<Model1 & Model2>;
 
-        type Form = FormGroup<Model1FormPart['controls'] & Model2FormPart['controls']>;
+        // form by Model1
+        const form1: Form1[T] = fb.group<Form1[G]>({
+            a: fb.control(42),
+            b: fb.control(42),
+        })
 
-        // With c and d
-        const form1: Form = fb.group<Form['controls']>({
+        expect(form1.value.a).toBe(42);
+        expect(form1.value.b).toBe(42);
+
+        // Form by Model2
+        const form2: Form2[T] = fb.group<Form2[G]>({
+            c: fb.control(42),
+            d: fb.control(null),
+        })
+
+        expect(form2.value.c).toBe(42);
+        expect(form2.value.d).toBe(null);
+
+        // Form with all fields
+        const form: Form[T] = fb.group<Form[G]>({
             a: fb.control(42),
             b: fb.control(42),
             c: fb.control(42),
             d: fb.control(null),
         })
 
-        expect(form1.value.a).toBe(42);
-        expect(form1.value.b).toBe(42);
-        expect(form1.value.c).toBe(42);
-        expect(form1.value.d).toBe(null);
+        expect(form.value.a).toBe(42);
+        expect(form.value.b).toBe(42);
+        expect(form.value.c).toBe(42);
+        expect(form.value.d).toBe(null);
     })
 
     it('Complex form with different annotations', () => {
@@ -81,9 +98,9 @@ describe('Complicated test', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form1 = FormModel<Model>
+        type Form1 = FormType<Model>
 
-        const form1: Form1 = fb.group<Form1['controls']>({
+        const form1: Form1[T] = fb.group<Form1[G]>({
             a: fb.control(42),
             b: fb.control(['test']),
             c: fb.control({
@@ -112,11 +129,11 @@ describe('Complicated test', () => {
             },
         });
 
-        type Form2 = FormModel<Model, { b: FormElementArray }>;
+        type Form2 = FormType<Model, { b: FormElementArray }>;
 
-        const form2: Form2 = fb.group<Form2['controls']>({
+        const form2: Form2[T] = fb.group<Form2[G]>({
             a: fb.control(42),
-            b: fb.array<Form2['controls']['b']['controls'][0]>([
+            b: fb.array<Form2['b'][I]>([
                 fb.control('test')
             ]),
             c: fb.control({
@@ -145,12 +162,12 @@ describe('Complicated test', () => {
             },
         });
 
-        type Form3 = FormModel<Model, { c: FormElementGroup }>;
+        type Form3 = FormType<Model, { c: FormElementGroup }>;
 
-        const form3: Form3 = fb.group<Form3['controls']>({
+        const form3: Form3[T] = fb.group<Form3[G]>({
             a: fb.control(42),
             b: fb.control(['test']),
-            c: fb.group<Form3['controls']['c']['controls']>({
+            c: fb.group<Form3['c'][G]>({
                 d: fb.control({
                     e: [43],
                 }),
@@ -170,16 +187,16 @@ describe('Complicated test', () => {
         expect(form3.controls.c.controls.d.value).toStrictEqual({ e: [43], });
         expect(form3.controls.c.controls.f.value).toStrictEqual({ g: 'test' });
 
-        type Form4 = FormModel<Model, { c: { f: FormElementGroup } }>;
+        type Form4 = FormType<Model, { c: { f: FormElementGroup } }>;
 
-        const form4: Form4 = fb.group<Form4['controls']>({
+        const form4: Form4[T] = fb.group<Form4[G]>({
             a: fb.control(42),
             b: fb.control(['test']),
-            c: fb.group({
+            c: fb.group<Form4['c'][G]>({
                 d: fb.control({
                     e: [43],
                 }),
-                f: fb.group({
+                f: fb.group<Form4['c']['f'][G]>({
                     g: fb.control('test')
                 }),
             })
@@ -195,20 +212,18 @@ describe('Complicated test', () => {
         expect(form4.controls.c.controls.d.value).toStrictEqual({ e: [43] });
         expect(form4.controls.c.controls.f.controls.g.value).toBe('test');
 
-        type Form5 = FormModel<Model, { c: { d: { e: FormElementArray } } }>;
+        type Form5 = FormType<Model, { c: { d: { e: FormElementArray } } }>;
 
-        const form5: Form5 = fb.group<Form5['controls']>({
+        const form5: Form5[T] = fb.group<Form5[G]>({
             a: fb.control(42),
             b: fb.control(['test']),
-            c: fb.group({
-                d: fb.group({
-                    e: fb.array([
+            c: fb.group<Form5['c'][G]>({
+                d: fb.group<Form5['c']['d'][G]>({
+                    e: fb.array<Form5['c']['d']['e'][I]>([
                         fb.control(43)
                     ]),
                 }),
-                f: [{
-                    g: 'test'
-                }],
+                f: fb.control({ g: 'test' }),
             })
         });
 
@@ -222,7 +237,7 @@ describe('Complicated test', () => {
         expect(form5.controls.c.controls.d.controls.e.controls[0].value).toStrictEqual(43);
         expect(form5.controls.c.controls.f.value).toStrictEqual({ g: 'test' });
 
-        type Form6 = FormModel<Model, {
+        type Form6 = FormType<Model, {
             b: FormElementArray,
             c: {
                 d: FormElementGroup,
@@ -230,16 +245,16 @@ describe('Complicated test', () => {
             },
         }>
 
-        const form6: Form6 = fb.group<Form6['controls']>({
+        const form6: Form6[T] = fb.group<Form6[G]>({
             a: fb.control(42),
-            b: fb.array<Form6['controls']['b']['controls'][0]>([
+            b: fb.array<Form6['b'][I]>([
                 fb.control('test')
             ]),
-            c: fb.group<Form6['controls']['c']['controls']>({
-                d: fb.group<Form6['controls']['c']['controls']['d']['controls']>({
+            c: fb.group<Form6['c'][G]>({
+                d: fb.group<Form6['c']['d'][G]>({
                     e: fb.control([43]),
                 }),
-                f: fb.group<Form6['controls']['c']['controls']['f']['controls']>({
+                f: fb.group<Form6['c']['f'][G]>({
                     g: fb.control('test')
                 }),
             })

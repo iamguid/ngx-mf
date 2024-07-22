@@ -1,7 +1,7 @@
 import "@angular/compiler"
 
 import { FormBuilder } from "@angular/forms";
-import { FormElementControl, FormElementGroup, FormModel, FormType, T } from "../src/index.mjs";
+import { FormElementControl, FormElementGroup, FormType, G, T } from "../src/index.mjs";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field should be nonnullalbe', () => {
@@ -11,11 +11,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, FormElementGroup>;
+        type Form = FormType<Model, FormElementGroup>;
 
-        type t = Form['controls']
-
-        const form: Form = fb.group<Form['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
             a: fb.control(42)
         })
 
@@ -32,11 +30,11 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: FormElementGroup }>;
-        type NestedForm = NonNullable<Form['controls']['a']>['controls'];
+        type Form = FormType<Model, { a: FormElementGroup }>;
+        type NestedForm = Form['a'];
 
-        const form: Form = fb.group<Form['controls']>({
-            a: fb.group<NestedForm>({
+        const form: Form[T] = fb.group<Form[G]>({
+            a: fb.group<NestedForm[G]>({
                 b: fb.control(42)
             })
         })
@@ -52,9 +50,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model>
+        type Form = FormType<Model>
 
-        const form: Form = fb.group<Form['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
             a: fb.control(new Date('2022-07-08T06:46:28.452Z'))
         })
 
@@ -62,7 +60,7 @@ describe('Misc tests', () => {
         expect(form.controls.a.value.toISOString()).toBe(new Date('2022-07-08T06:46:28.452Z').toISOString());
     })
 
-    it('FormModel after Omit', () => {
+    it('FormType after Omit', () => {
         interface Model {
             a: number;
             b: number;
@@ -70,9 +68,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Omit<Model, 'a'>>;
+        type Form = FormType<Omit<Model, 'a'>>;
 
-        const form: Form = fb.group<Form['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
             b: fb.control(42)
         })
 
@@ -87,9 +85,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder();
 
-        type Form = FormModel<Model>
+        type Form = FormType<Model>
 
-        const form: Form = fb.group<Form['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
             a: fb.control(42)
         })
 
@@ -113,16 +111,16 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: { b: FormElementGroup }, d: { e: FormElementGroup } }>;
+        type Form = FormType<Model, { a: { b: FormElementGroup }, d: { e: FormElementGroup } }>;
 
-        const form: Form = fb.group<Form['controls']>({
-            a: fb.group<Form['controls']['a']['controls']>({
-                b: fb.group<Form['controls']['a']['controls']['b']['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
+            a: fb.group<Form['a'][G]>({
+                b: fb.group<Form['a']['b'][G]>({
                     c: fb.control(42)
                 })
             }),
-            d: fb.group<NonNullable<Form['controls']['d']>['controls']>({
-                e: fb.group<NonNullable<NonNullable<Form['controls']['d']>['controls']['e']>['controls']>({
+            d: fb.group<Form['d'][G]>({
+                e: fb.group<Form['d']['e'][G]>({
                     f: fb.control(42)
                 })
             })
@@ -139,9 +137,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model & { b: string }>;
+        type Form = FormType<Model & { b: string }>;
 
-        const form: Form = fb.group<Form['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
             a: fb.control(42),
             b: fb.control('test'),
         })
@@ -162,10 +160,10 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, { a: FormElementGroup }>
+        type Form = FormType<Model, { a: FormElementGroup }>
 
-        const form: Form = fb.group<Form['controls']>({
-            a: fb.group<NonNullable<Form['controls']['a']>['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
+            a: fb.group<Form['a'][G]>({
                 b: fb.control(42)
             })
         })
@@ -185,9 +183,9 @@ describe('Misc tests', () => {
 
         const fb = new FormBuilder().nonNullable;
 
-        type Form = FormModel<Model, FormElementGroup>
+        type Form = FormType<Model, FormElementGroup>
 
-        const form: Form = fb.group<Form['controls']>({
+        const form: Form[T] = fb.group<Form[G]>({
             a: fb.control({
                 b: {
                     c: 42
@@ -234,13 +232,13 @@ describe('Misc tests', () => {
             link: string;
         }
     
-        type WorkingForm = FormModel<Working>;
-        type BrokenForm = FormModel<Broken>;
+        type WorkingForm = FormType<Working>;
+        type BrokenForm = FormType<Broken>;
 
         const fb = new FormBuilder().nonNullable;
       
-        const wf = fb.group<WorkingForm['controls']>({name: fb.control('Name')});
-        const bf = fb.group<BrokenForm['controls']>({link: fb.control('Link')}); 
+        const wf = fb.group<WorkingForm[G]>({name: fb.control('Name')});
+        const bf = fb.group<BrokenForm[G]>({link: fb.control('Link')}); 
     })
 
     it('Undefined value and optional property https://github.com/iamguid/ngx-mf/issues/4', () => {
@@ -252,11 +250,11 @@ describe('Misc tests', () => {
             optionalE?: number | undefined;
         }
     
-        type OptionalForm = FormModel<Optional>;
+        type OptionalForm = FormType<Optional>;
 
         const fb = new FormBuilder().nonNullable;
       
-        const wf = fb.group<OptionalForm['controls']>({
+        const wf: OptionalForm[T] = fb.group<OptionalForm[G]>({
             // optionalA: fb.control(321),
             optionalB: fb.control(123),
             optionalC: fb.control(undefined),

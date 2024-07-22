@@ -52,9 +52,7 @@ type BuildFormTypeTreeNode<
         [I]: TModel extends Array<infer TArrayElement> 
           ? TAnnotation extends Array<infer TArrayElementAnnotation extends FormElementTree>
             ? BuildFormTypeTreeNode<TArrayElement, TArrayElementAnnotation>
-            : TAnnotation extends FormElementArray
-              ? BuildFormTypeTreeNode<TArrayElement, FormElementArray>
-              : TResult['controls'][0] 
+            : TResult['controls'][0] 
           : BuildFormTypeTreeNode<TModel, TAnnotation> 
       }
     : TResult extends FormGroup

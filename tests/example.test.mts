@@ -1,7 +1,7 @@
 import "@angular/compiler"
 
 import { FormBuilder, Validators } from "@angular/forms"
-import { FormElementGroup, FormModel } from "../src/index.mjs"
+import { FormElementGroup, FormType, G, I, T } from "../src/index.mjs"
 
 describe('Examples', () => {
     it('User form example', () => {
@@ -16,7 +16,7 @@ describe('Examples', () => {
         }
 
         interface IUserModel {
-            id: number;
+            id?: number;
             firstName: string;
             lastName: string;
             nickname: string;
@@ -26,18 +26,18 @@ describe('Examples', () => {
 
         const fb = new FormBuilder();
 
-        type UserForm = FormModel<Omit<IUserModel, 'id'>, { contacts: [ FormElementGroup ] }>;
-        type ContactForm = UserForm['controls']['contacts']['controls'][0];
+        type UserForm = FormType<IUserModel, { contacts: [ FormElementGroup ] }>;
+        type ContactForm = UserForm['contacts'][I];
 
-        const form: UserForm = fb.group<UserForm['controls']>({
+        const form: UserForm[T] = fb.group<UserForm[G]>({
             firstName: fb.nonNullable.control('test'),
             lastName: fb.nonNullable.control('test'),
             nickname: fb.nonNullable.control('test'),
             birthday: fb.nonNullable.control(13),
-            contacts: fb.array<ContactForm>([]),
+            contacts: fb.array<ContactForm[T]>([]),
         });
 
-        const value: Omit<IUserModel, 'id'> = {
+        const value: IUserModel = {
             firstName: 'Vladislav',
             lastName: 'Lebedev',
             nickname: 'iam.guid',
@@ -48,7 +48,7 @@ describe('Examples', () => {
             }],
         }
 
-        form.controls.contacts.controls.push(fb.group<ContactForm['controls']>({
+        form.controls.contacts.controls.push(fb.group<ContactForm[G]>({
             type: fb.nonNullable.control(ContactType.Email),
             contact: fb.nonNullable.control('test@test.com', Validators.email),
         }));
