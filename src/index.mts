@@ -64,7 +64,7 @@ type BuildFormTypeTreeNode<
 
 // Handle form tree record
 type BuildFormTreeKeyof<TModel extends Record<string, any>, TAnnotation extends Structure<TModel>> = {
-  [key in keyof TModel]: BuildFormTreeNode<TModel[key], TAnnotation[key]>
+  [key in keyof TModel]: BuildFormTreeNode<TModel[key], NonNullable<TAnnotation[key]>>
 }
 
 // Handle form tree node
@@ -73,9 +73,9 @@ type BuildFormTreeNode<TModel, TAnnotation> =
   TAnnotation extends null
     ? TModel extends Array<any>
       ? BuildFormTreeNode<TModel, FormElementArray>
-    : TModel extends Record<string, any>
-      ? BuildFormTreeNode<TModel, FormElementGroup>
-  : BuildFormTreeNode<TModel, FormElementControl>
+      : TModel extends Record<string, any>
+        ? BuildFormTreeNode<TModel, FormElementGroup>
+    : BuildFormTreeNode<TModel, FormElementControl>
 
   // FormArray annotation
   //
@@ -113,6 +113,14 @@ type BuildFormTreeNode<TModel, TAnnotation> =
     ? TModel extends Array<infer TArrayElement>
       ? FormArray<BuildFormTreeNode<TArrayElement, TArrayElementAnnotation>>
     : never
+
+  // Empty object type annotation
+  //
+  // If we have Record empty type in annotation
+  // and current model is Record
+  // then infer FormControl type
+  : {} extends TAnnotation
+    ? BuildFormTreeNode<TModel, FormElementControl>
 
   // FormGroup type annotation
   //

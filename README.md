@@ -51,7 +51,7 @@ type Form = FormType<IUserModel, { contacts: [FormElementGroup] }>
 Then you have form type, before form will be defined:
 
 ```typescript
-FormGroup<{
+Form[T] is FormGroup<{
     id?: FormControl<number | undefined> | undefined; 
     firstName: FormControl<string | null>;
     lastName: FormControl<string | null>;
@@ -66,13 +66,15 @@ FormGroup<{
 
 ## Usage
 
-`ngx-mf` exports type `FormModel` and `FormType`
+`ngx-mf` exports types `FormModel` and `FormType`
 
-`FormModel<TModel, TAnnotations>` - This is the type that recursively turns `TModel` fields (where `TModel` is your model type) into a `FormGroup`, `FormArray` or `FormControl`.
+`FormModel<TModel, TAnnotations>` - recursively turns `TModel` fields (where `TModel` is your model type) into a `FormGroup`, `FormArray` or `FormControl`.
 You can choose what you want: `FormGroup`, `FormArray` or `FormControl` by annotation.
 You can pass `TAnnotations` as the second argument to specify output type using special easy to use syntax.
 
-For example you have some model from How It Works chapter:
+`FormType` needs to to get types of nested fields.
+
+Example model from How It Works chapter:
 
 ```typescript
 enum ContactType {
@@ -109,28 +111,29 @@ Where `contacts` is our field, `[FormElementGroup]` indicates that field is `For
 
 So our full `UserForm` type should be:
 ```typescript
-FormModel<IUserModel, { contacts: [FormElementGroup] }>
+type UserForm = FormType<IUserModel, { contacts: [FormElementGroup] }>
 ```
 
 You can find full example
-here [/tests/example.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/example.test.ts)
+here [/tests/example.test.mts](https://github.com/iamguid/ngx-mf/blob/master/tests/example.test.mts)
 
-I strongly recommend always use `FormType`
-
-`FormType<TModel, TAnnotations>` - This is the type that recursively turns `TModel` fields (where `TModel` is your model type) into special types tree that you can use for shortcuts to form types.
-`FormType` returns tree with your model structure and additional fields for shortcuts, there is 3 type of shortcuts:
-* `T` - just type of full form for current node, something like `FormGroup<...>`
+`FormType<TModel, TAnnotations>` - Recursively turns `TModel` fields (where `TModel` is your model type) into types tree with your model structure and additional fields for shortcuts.
+There is 3 type of shortcuts:
+* `T` - type of full form for current node, something like `FormGroup<...>`
 * `G` - group type of your FromGroup, looks like `{a: FromControl<...>, b: FormControl<...>}`
 * `I` - array item type of your FormArray, looks like `FormControl<...>`
 
 You can combine keys of your model and this additional fields for every level of your type to get type that you need.
 
+I strongly recommend to use `FormType`, because in specific cases you may need to get form type for nested fields,
+and sometime this fields are optional, and it will be difficult to get type of nested optional field.
+
 ## Annotations
 `ngx-mf` annotations have three different keywords: `FormElementArray`, `FormElementGroup`, `FormElementControl`
 
-* `FormElementArray` - infer `FormArray`
-* `FormElementGroup` - infer `FormGroup`
-* `FormElementControl` - infer `FormControl`
+* `FormElementArray` - infer `FormArray` on the same nesting
+* `FormElementGroup` - infer `FormGroup` on the same nesting
+* `FormElementControl` - infer `FormControl` on the same nesting
 
 Also annotations can be objects, like `{a: FormElementGroup}`,
 and arrays, like `[FormElementGroup]`.
@@ -149,15 +152,14 @@ Check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master
 > 
 > ```typescript
 > interface Model {
->     a: number;
->     b: string[];
->     c: {
->         d: {
->             e: number[];
->         }
->         f: {
->             g: string;
->         }
+>     a: number | null;
+>     b?: {
+>         c: {
+>             d: number[];
+>             e: { 
+>                 f: string; 
+>             }
+>         }[]
 >     }
 > }
 > ```
@@ -166,151 +168,130 @@ Check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master
 
 Lets see what `FormModel` will do without annotations
 
-> Define Form type:
-> 
 > ```typescript
 > type Form = FormModel<Model>
 > ```
-
-> Inferred `Form` type
-> 
+>
 > ```typescript
-> FormGroup<{
+> Form[T] is FormGroup<{
 >     a: FormControl<number | null>;
->     b: FormControl<string[] | null>;
->     c: FormControl<{
+>     b: FormControl<string[]>;
+>     c?: FormControl<{
 >         d: {
->             e: number[];
->         };
->         f: {
->             g: string;
->         };
->     } | null>;
-> }>
-
-As we see each `FormGroup` elements is `FormControl` 
-it is the default behavior of `FormModel`
-
-The same behavior for `FormType`, but `FormType` will provide you tree of form types
-
----
-
-Now let's say that `b` should be `FormArray`
-
-> Define Form type:
-> 
-> ```typescript
-> type Form = FormModel<Model, { b: FormElementArray }>
-> ```
-
-> Inferred `Form` type
-> 
-> ```typescript
-> FormGroup<{
->     a: FormControl<number | null>;
->     b: FormArray<FormControl<string | null>>; // <<
->     c: FormControl<{
->         d: {
->             e: number[];
->         };
->         f: {
->             g: string;
->         };
->     } | null>;
+>            e: number[];
+>            f: {
+>                g: string;
+>            };
+>         }[];
+>     } | undefined> | undefined;
 > }>
 > ```
+
+As you see root is `FormGroup`, and elements is `FormControl` - it is the default behavior of `FormModel`
+
+As you see `c` field is optional, because in `Model` this field marked as optional in form type too.
+That means, all optionals will be optionals in inferred type.
 
 ---
 
 Now let's say that `c` should be `FormGroup`
 
-> Define Form type:
-> 
 > ```typescript
-> type Form = FormModel<Model, { c: FormElementGroup }>
+> type Form = FormType<Model, { c: FormElementGroup }>
 > ```
- 
-> Inferred `Form` type
-> 
+>
 > ```typescript
-> FormGroup<{
+> Form[T] is FormGroup<{
 >     a: FormControl<number | null>;
->     b: FormControl<string[] | null>;
->     c: FormGroup<{ // <<
->         d: FormControl<{
->             e: number[];
->         } | null>;
->         f: FormControl<{
->             g: string;
->         } | null>;
->     }>;
+>     b: FormControl<string>;
+>     c?: FormGroup<{ // <<
+>         d: FormControl<{ // <<
+>            e: number[];
+>            f: {
+>                g: string;
+>            };
+>         }[]>;
+>     } | undefined> | undefined;
 > }>
 > ```
-
 ---
 
-Now let's say that `c.f` should be `FormGroup`
+Now let's say that `c.d` should be `FormArray`
 
-> Define Form type:
-> 
 > ```typescript
-> type Form = FormModel<Model, { c: { f: FormElementGroup } }>
+> type Form = FormType<Model, { c: { d: FormElementArray } }>
 > ```
- 
-> Inferred `Form` type
-> 
+>
 > ```typescript
-> FormGroup<{
+> Form[T] is FormGroup<{
 >     a: FormControl<number | null>;
->     b: FormControl<string[] | null>;
->     c: FormGroup<{ // <<
->         d: FormControl<{
->             e: number[];
->         } | null>;
->         f: FormGroup<{ // <<
->             g: FormControl<string | null>;
->         }>;
->     }>;
+>     b: FormControl<string[]>;
+>     c?: FormGroup<{ // <<
+>         d: FormArray<FormControl<{ // <<
+>            e: number[];
+>            f: {
+>                g: string;
+>            };
+>         }>>;
+>     } | undefined> | undefined;
 > }>
 > ```
-
-As we see field `c` is also `FormGroup` because every nested
-fields will be `FormGroup` too.
 
 ---
 
 Now let's say that `c.d.e` should be `FormArray`
 
-> Define Form type:
-> 
 > ```typescript
-> type Form = FormModel<Model, { c: { d: { e: FormElementArray } } }>
+> type Form = FormType<Model, { c: { d: [ { e: FormElementArray } ] } }>
 > ```
-
-> Inferred `Form` type
-> 
+>
 > ```typescript
-> FormGroup<{
+> Form[T] is FormGroup<{
 >     a: FormControl<number | null>;
->     b: FormControl<string[] | null>;
->     c: FormGroup<{ // <<
->         d: FormGroup<{ // <<
->             e: FormArray<FormControl<number | null>>; // <<
->         }>;
->         f: FormControl<{
->             g: string;
->         } | null>;
->     }>;
+>     b: FormControl<string[]>;
+>     c?: FormGroup<{ // <<
+>         d: FormArray<FormGroup<{ // <<
+>            e: FormArray<FormControl<number>>; // <<
+>            f: {
+>                g: string;
+>            };
+>         }>>;
+>     } | undefined> | undefined;
 > }>
 > ```
 
 ---
 
-> If you pass array type to FormModel then you get FormArray
+Now let's say that `c.d.e` should be `FormArray` and `c.d.f` should be `FormGroup`
+
+> ```typescript
+> type Form = FormType<Model, { c: { d: [ { e: FormElementArray, f: FormElementGroup } ] } }>
+> ```
+>
+> ```typescript
+> Form[T] is FormGroup<{
+>     a: FormControl<number | null>;
+>     b: FormControl<string[]>;
+>     c?: FormGroup<{ // <<
+>         d: FormArray<FormGroup<{ // <<
+>            e: FormArray<FormControl<number>>; // <<
+>            f: FormGroup<{ // <<
+>                g: FormControl<string>; // <<
+>            }>;
+>         }>>;
+>     } | undefined> | undefined;
+> }>
+> ```
+
+
+
+---
+
+> If you pass array type to FormType then you get FormArray
 > instead of FormGroup
 >
 > ```typescript
-> type Form = FormModel<number[]>
+> type Form = FormType<number[]>
 > ```
 > 
 > would be
