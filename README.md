@@ -144,7 +144,7 @@ If you use `[]` then object with the same nesting will be `FormArray`
 And you can combine `keys of TModel`, `{}`, `[]`, `FormElementArray`, `FormElementGroup`, `FormElementControl`
 to specify what you do want to infer in result type.
 
-Check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts) for details
+Check [/tests/annotations.test.mts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.mts) for details
 
 ## Examples Of Usage
 
@@ -313,7 +313,7 @@ Now let's say that `c.d.e` should be `FormArray` and `c.d.f` should be `FormGrou
 > ```
 
 Other examples you can find in annotation tests
-[/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
+[/tests/annotations.test.mts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.mts)
 
 ## The right way to debug your types
 
@@ -365,3 +365,4 @@ Because if you use array syntax, then you can't pass argument to FormGroup type.
 * Stackoverflow questions - https://stackoverflow.com/questions/72500855/formbuilder-with-strongly-typed-form-in-ng14 https://stackoverflow.com/questions/72507263/angular-14-strictly-typed-reactive-forms-how-to-type-formgroup-model-using-exi
 * Dev.to article - https://dev.to/iamguid/new-way-to-cook-angular-14-typed-forms-1g7h
 * Medium article - https://medium.com/p/1ffebf193df
+* Playground - 
