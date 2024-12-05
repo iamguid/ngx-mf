@@ -68,11 +68,11 @@ Form[T] is FormGroup<{
 
 `ngx-mf` exports types `FormModel` and `FormType`
 
-`FormModel<TModel, TAnnotations>` - recursively turns `TModel` fields (where `TModel` is your model type) into a `FormGroup`, `FormArray` or `FormControl`.
-You can choose what you want: `FormGroup`, `FormArray` or `FormControl` by annotation.
+`FormModel<TModel, TAnnotations>` - WARNING (deprecated) recursively turns `TModel` fields (where `TModel` is your model type) into a `FormGroup`, `FormArray` or `FormControl`.
+You can choose what do you want: `FormGroup`, `FormArray` or `FormControl` by annotation.
 You can pass `TAnnotations` as the second argument to specify output type using special easy to use syntax.
 
-`FormType` needs to to get types of nested fields.
+`FormType` needs to get types of nested fields.
 
 Example model from How It Works chapter:
 
@@ -99,7 +99,7 @@ interface IUserModel {
 
 Lets say we want infer `FormGroup` where fields `firstName`, `lastName`, `nickname`, `birthday` should be `FormControl` and field `contacts` should be `FormArray` of `FormGroups`.
 
-For that we need to pass annotation in our `FormModel` type.
+For that we need to pass annotation in our `FormType` type.
  The syntax of annotation will be:
 
 ```typescript
@@ -107,7 +107,7 @@ For that we need to pass annotation in our `FormModel` type.
 ```
 
 Where `contacts` is our field, `[FormElementGroup]` indicates that field is `FormArray`.
-`FormElementGroup` indicates that we have `FormGroup` inside `FormArray`.
+`[FormElementGroup]` indicates that we have `FormGroup` inside `FormArray`.
 
 So our full `UserForm` type should be:
 ```typescript
@@ -129,7 +129,7 @@ I strongly recommend to use `FormType`, because in specific cases you may need t
 and sometime this fields are optional, and it will be difficult to get type of nested optional field.
 
 ## Annotations
-`ngx-mf` annotations have three different keywords: `FormElementArray`, `FormElementGroup`, `FormElementControl`
+`ngx-mf` annotations have three different annotations: `FormElementArray`, `FormElementGroup`, `FormElementControl`
 
 * `FormElementArray` - infer `FormArray` on the same nesting
 * `FormElementGroup` - infer `FormGroup` on the same nesting
@@ -142,7 +142,7 @@ If you use `{}` then object with the same nesting will be `FormGroup`
 If you use `[]` then object with the same nesting will be `FormArray`
 
 And you can combine `keys of TModel`, `{}`, `[]`, `FormElementArray`, `FormElementGroup`, `FormElementControl`
-to specify what you want to infer in result type.
+to specify what you do want to infer in result type.
 
 Check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts) for details
 
@@ -166,10 +166,10 @@ Check [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master
 
 ---
 
-Lets see what `FormModel` will do without annotations
+Lets see what `FormType` will do without annotations
 
 > ```typescript
-> type Form = FormModel<Model>
+> type Form = FormType<Model>
 > ```
 >
 > ```typescript
@@ -187,9 +187,9 @@ Lets see what `FormModel` will do without annotations
 > }>
 > ```
 
-As you see root is `FormGroup`, and elements is `FormControl` - it is the default behavior of `FormModel`
+As you can see root is `FormGroup`, and elements is `FormControl` - it is the default behavior of `FormType` without annotations
 
-As you see `c` field is optional, because in `Model` this field marked as optional in form type too.
+As you can see `c` field is optional, because in `Model` this field marked as optional in form type too.
 That means, all optionals will be optionals in inferred type.
 
 ---
@@ -287,7 +287,7 @@ Now let's say that `c.d.e` should be `FormArray` and `c.d.f` should be `FormGrou
 
 ---
 
-> If you pass array type to FormType then you get FormArray
+> If you pass array type to FormType then you will get FormArray
 > instead of FormGroup
 >
 > ```typescript
@@ -303,17 +303,26 @@ Now let's say that `c.d.e` should be `FormArray` and `c.d.f` should be `FormGrou
 > Also you can define FormArray recursively like group inside
 > array inside array :)
 > ```typescript
-> type Form = FormModel<SomeModel, [[FormElementGroup]]>
+> type Form = FormType<SomeModel, [[FormElementGroup]]>
 > ```
 
 > Or array inside group inside array for example:
 > 
 > ```typescript
-> type Form = FormModel<SomeModel, [{a: FormElementArray}]>
+> type Form = FormType<SomeModel, [{a: FormElementArray}]>
 > ```
 
 Other examples you can find in annotation tests
 [/tests/annotations.test.ts](https://github.com/iamguid/ngx-mf/blob/master/tests/annotations.test.ts)
+
+## The right way to debug your types
+
+* Always use `FormGroup<FormType[G]>` types when you create your form group.
+Because it will be more simpler to debug wrong types, and it allow you to not to specify controls types directly.
+See answer here https://github.com/iamguid/ngx-mf/issues/19
+
+* Use FormBuilder (`fb.group<Form[G]>(...)`) or constructor (`new FormGroup<Form[G]>(...)`) syntax to define your forms.
+Because if you use array syntax, then you can't pass argument to FormGroup type.
 
 ## Questions
 
@@ -350,14 +359,6 @@ Other examples you can find in annotation tests
 > Q: What about complicated forms that includes many of fields, groups and controls
 > 
 > A: It is the main scenario of `ngx-mf`
-
-## Tips And Tricks
-
-* Always use `FormType` types when you create your form.
-Because it will be more simpler to debug wrong types, and it allow you to not to specify controls types directly.
-
-* Use FormBuilder (`fb.group<Form[G]>(...)`) or constructor (`new FormGroup<Form[G]>(...)`) syntax to define your forms.
-Because if you use array syntax, then you can't pass argument to FormGroup type.
 
 ## Links
 * Reddit topic - https://www.reddit.com/r/angular/comments/vv2xmd/what_do_you_think_about_generating_formgroup_type/
