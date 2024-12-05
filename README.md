@@ -3,6 +3,10 @@
 
 It doesn't increase your bundle size because it's just TypeScript types.
 
+## Playground is here
+You can play around using this link:
+https://stackblitz.com/edit/ngx-mf-playground?file=src%2Fmain.ts
+
 ## Installation
 
 npm
@@ -365,4 +369,4 @@ Because if you use array syntax, then you can't pass argument to FormGroup type.
 * Stackoverflow questions - https://stackoverflow.com/questions/72500855/formbuilder-with-strongly-typed-form-in-ng14 https://stackoverflow.com/questions/72507263/angular-14-strictly-typed-reactive-forms-how-to-type-formgroup-model-using-exi
 * Dev.to article - https://dev.to/iamguid/new-way-to-cook-angular-14-typed-forms-1g7h
 * Medium article - https://medium.com/p/1ffebf193df
-* Playground - 
+* Playground - https://stackblitz.com/edit/ngx-mf-playground?file=src%2Fmain.ts

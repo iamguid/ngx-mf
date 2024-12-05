@@ -1,7 +1,7 @@
 import "@angular/compiler"
 
 import { FormBuilder } from "@angular/forms";
-import { FormElementControl, FormElementGroup, FormType, G, T } from "../src/index.mjs";
+import { FormElementControl, FormElementGroup, FormType, G, I, T } from "../src/index.mjs";
 
 describe('Misc tests', () => {
     it('undefined nullable optional field should be nonnullalbe', () => {
@@ -133,7 +133,7 @@ describe('Misc tests', () => {
     it('additional field', () => {
         interface Model {
             a: number;
-        } 
+        }
 
         const fb = new FormBuilder().nonNullable;
 
@@ -231,14 +231,14 @@ describe('Misc tests', () => {
         interface Broken {
             link: string;
         }
-    
+
         type WorkingForm = FormType<Working>;
         type BrokenForm = FormType<Broken>;
 
         const fb = new FormBuilder().nonNullable;
-      
-        const wf = fb.group<WorkingForm[G]>({name: fb.control('Name')});
-        const bf = fb.group<BrokenForm[G]>({link: fb.control('Link')}); 
+
+        const wf = fb.group<WorkingForm[G]>({ name: fb.control('Name') });
+        const bf = fb.group<BrokenForm[G]>({ link: fb.control('Link') });
     })
 
     it('Undefined value and optional property https://github.com/iamguid/ngx-mf/issues/4', () => {
@@ -249,11 +249,11 @@ describe('Misc tests', () => {
             optionalD?: number | undefined;
             optionalE?: number | undefined;
         }
-    
+
         type OptionalForm = FormType<Optional>;
 
         const fb = new FormBuilder().nonNullable;
-      
+
         const wf: OptionalForm[T] = fb.group<OptionalForm[G]>({
             // optionalA: fb.control(321),
             optionalB: fb.control(123),
@@ -261,5 +261,68 @@ describe('Misc tests', () => {
             optionalD: fb.control(undefined),
             optionalE: fb.control(432),
         });
+    })
+
+    it('Nested optional properties', () => {
+        enum ContactType {
+            Email,
+            Telephone,
+        }
+
+        interface IContactModel {
+            type: ContactType | null;
+            contact: string | null;
+        }
+
+        interface IUserModel {
+            id: number;
+            firstName: string | null;
+            lastName: string | null;
+            nickname: string | null;
+            birthday?: Date | null;
+            contacts: IContactModel[];
+        }
+
+
+        type MainForm = FormType<
+            Omit<IUserModel, 'id'>,
+            { contacts: [FormElementGroup] }
+        >;
+        type ContactForm = MainForm['contacts'];
+
+        const fb = new FormBuilder();
+
+        type t = ContactForm[I][T]
+
+        const form: MainForm[T] = fb.group<MainForm[G]>({
+            firstName: fb.control(null),
+            lastName: fb.control(null),
+            nickname: fb.control(null),
+            // birthday: fb.control(null), this is now optional <<<
+            contacts: fb.array<ContactForm[I]>([]),
+        });
+
+        const value: Omit<IUserModel, 'id'> = {
+            firstName: 'Vladislav',
+            lastName: 'Lebedev',
+            nickname: 'iam.guid',
+            birthday: new Date('2022-07-15T19:53:07.764Z'),
+            contacts: [
+                {
+                    type: ContactType.Email,
+                    contact: 'iam.guid@gmail.com',
+                },
+            ],
+        };
+
+        form.controls.contacts.controls.push(
+            fb.group<ContactForm[I][G]>({
+                type: fb.control(ContactType.Email),
+                contact: fb.control('test@test.com', Validators.email),
+            })
+        );
+
+        form.patchValue(value);
+
     })
 })
